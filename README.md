@@ -137,7 +137,7 @@ Swift Package Manager — add the dependency in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "0.1.0")
+    .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "1.0.0")
 ]
 ```
 
