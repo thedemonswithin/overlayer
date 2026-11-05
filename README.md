@@ -136,6 +136,22 @@ Overlayer.loadingConfiguration = LoadingConfiguration(backgroundStyle: AnyShapeS
 
 - **`LoadingConfiguration`** — passed to `showLoading` (or `Overlayer.loadingConfiguration`): `isBlocking` (default `true`; `false` lets touches pass straight through), `backgroundStyle`, `ignoresSafeArea`, `animation`.
 
+## Accessibility
+
+- **VoiceOver announcements.** A toast is announced when it becomes visible, using its model's `accessibilityAnnouncement` (default `nil`; the bundled models announce their title and message):
+
+```swift
+struct DownloadToastModel: ToastModel {
+    let fileName: String
+    var accessibilityAnnouncement: String? { "Downloaded \(fileName)" }
+}
+```
+
+- **Gestures as actions.** Swipe, tap and hold are not reachable with VoiceOver, so every toast offers *Dismiss* and *Pause* / *Resume* actions; the escape gesture (two-finger scrub) dismisses it.
+- **Blocking loader is modal.** While a blocking loader is up, VoiceOver cannot reach the screen beneath, and focus moves to the loader and back when it hides. A non-blocking loader is announced via `LoadingModel.accessibilityAnnouncement` instead.
+- **Reduce Motion.** Toasts fade instead of sliding or scaling.
+- **Localization.** Built-in strings ship in English and Russian; they follow your app's localizations, so add Russian to the app to get them.
+
 ## Installation
 
 Swift Package Manager — add the dependency in `Package.swift`:

@@ -18,6 +18,7 @@ struct LoadingHostView: View {
                     .fill(top.configuration.backgroundStyle)
                     .ignoresSafeArea(edges: top.configuration.ignoresSafeArea ? .all : [])
                     .contentShape(Rectangle())
+                    .accessibilityHidden(true)
                     .transition(.opacity)
                 top.content
                     // A new identity per presentation, so a nested overlay replacing the top one cross-fades instead of swapping in place.

@@ -10,6 +10,7 @@ import SwiftUI
 struct ToastHostView: View {
     @ObservedObject var presenter: ToastPresenter
     let relay: PassthroughRelay
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let configuration = presenter.containerConfiguration
@@ -56,6 +57,8 @@ struct ToastHostView: View {
     }
 
     private func transition(for position: ToastPosition) -> AnyTransition {
+        // With Reduce Motion, toasts fade instead of sliding or scaling.
+        if reduceMotion { return .opacity }
         switch position {
         case .top: return .move(edge: .top).combined(with: .opacity)
         case .bottom: return .move(edge: .bottom).combined(with: .opacity)

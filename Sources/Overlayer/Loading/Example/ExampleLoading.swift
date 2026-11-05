@@ -11,6 +11,10 @@ public import SwiftUI
 public struct SpinnerLoadingModel: LoadingModel {
     public var message: String?
 
+    public var accessibilityAnnouncement: String? {
+        message ?? OverlayAccessibility.localized("Loading")
+    }
+
     public init(message: String? = nil) {
         self.message = message
     }
@@ -49,6 +53,10 @@ public final class LoadingProgress: ObservableObject {
 
 public struct ProgressLoadingModel: LoadingModel {
     public var progress: LoadingProgress
+
+    public var accessibilityAnnouncement: String? {
+        progress.message ?? OverlayAccessibility.localized("Loading")
+    }
 
     public init(progress: LoadingProgress) {
         self.progress = progress

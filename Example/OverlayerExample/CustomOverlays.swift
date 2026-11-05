@@ -12,6 +12,8 @@ import SwiftUI
 struct DownloadToastModel: ToastModel {
     let fileName: String
     let onOpen: () -> Void
+
+    var accessibilityAnnouncement: String? { "Download finished: \(fileName)" }
 }
 
 struct DownloadToastView: View {
@@ -40,6 +42,8 @@ struct DownloadToastView: View {
 // A custom (blocking) loading type with a Cancel button driven through the LoadingContext.
 struct BrandedLoadingModel: LoadingModel {
     let title: String
+
+    var accessibilityAnnouncement: String? { title }
 }
 
 struct BrandedLoadingView: View {

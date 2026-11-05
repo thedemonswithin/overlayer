@@ -22,6 +22,16 @@ struct ToastItemView: View {
             .onTapGesture { handleTap() }
             .onLongPressGesture(minimumDuration: 0.2, maximumDistance: 20, pressing: { handlePressing($0) }, perform: {})
             .gesture(swipeGesture)
+            // Gestures are unreachable with VoiceOver, so the same controls are offered as accessibility actions; the escape gesture (two-finger scrub) dismisses.
+            .accessibilityElement(children: .contain)
+            .accessibilityAction(.escape) { toast.context.dismiss() }
+            .accessibilityAction(named: Text("Dismiss", bundle: .module)) { toast.context.dismiss() }
+            .modifier(PauseAction(context: toast.context, isProgressive: toast.context.isProgressive, toggle: togglePauseFromAccessibility))
+    }
+
+    private func togglePauseFromAccessibility() {
+        isStuckPaused.toggle()
+        syncPause()
     }
 
     private var swipeGesture: some Gesture {
@@ -95,6 +105,21 @@ struct ToastItemView: View {
         case .top: return translation < -60 || predicted < -150
         case .bottom: return translation > 60 || predicted > 150
         case .center: return abs(translation) > 60 || abs(predicted) > 150
+        }
+    }
+}
+
+// Pause / Resume action for auto-dismissing toasts; its name follows the current state.
+private struct PauseAction: ViewModifier {
+    @ObservedObject var context: ToastContext
+    let isProgressive: Bool
+    let toggle: () -> Void
+
+    func body(content: Content) -> some View {
+        if isProgressive {
+            content.accessibilityAction(named: context.isPaused ? Text("Resume", bundle: .module) : Text("Pause", bundle: .module), toggle)
+        } else {
+            content
         }
     }
 }

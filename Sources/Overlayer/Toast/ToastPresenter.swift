@@ -21,6 +21,8 @@ final class ToastPresenter: ObservableObject {
     var onChange: (() -> Void)?
     /// Called once the animation of a visible-set change has played out.
     var onSettled: (() -> Void)?
+    /// Speaks a toast's announcement for VoiceOver; replaceable in tests.
+    var announce: @MainActor (String?) -> Void = OverlayAccessibility.announce
 
     private var queue: [ActiveToast] = []
     /// One sleeping task per running auto-dismiss toast; nothing ticks.
@@ -75,6 +77,7 @@ final class ToastPresenter: ObservableObject {
             visible.append(toast)
         }
         toast.configuration.haptic.trigger()
+        announce(toast.model.accessibilityAnnouncement)
         startLifetime(of: toast)
     }
 

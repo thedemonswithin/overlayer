@@ -11,6 +11,10 @@ public struct SuccessToastModel: ToastModel {
     public var title: String?
     public var message: String
 
+    public var accessibilityAnnouncement: String? {
+        [title, message].compactMap(\.self).joined(separator: ". ")
+    }
+
     public init(title: String? = nil, message: String) {
         self.title = title
         self.message = message
@@ -20,6 +24,10 @@ public struct SuccessToastModel: ToastModel {
 public struct ErrorToastModel: ToastModel {
     public var title: String?
     public var message: String
+
+    public var accessibilityAnnouncement: String? {
+        [title, message].compactMap(\.self).joined(separator: ". ")
+    }
 
     public init(title: String? = nil, message: String) {
         self.title = title
@@ -31,6 +39,10 @@ public struct InfoToastModel: ToastModel {
     public var title: String?
     public var message: String
 
+    public var accessibilityAnnouncement: String? {
+        [title, message].compactMap(\.self).joined(separator: ". ")
+    }
+
     public init(title: String? = nil, message: String) {
         self.title = title
         self.message = message
@@ -40,6 +52,10 @@ public struct InfoToastModel: ToastModel {
 public struct WarningToastModel: ToastModel {
     public var title: String?
     public var message: String
+
+    public var accessibilityAnnouncement: String? {
+        [title, message].compactMap(\.self).joined(separator: ". ")
+    }
 
     public init(title: String? = nil, message: String) {
         self.title = title

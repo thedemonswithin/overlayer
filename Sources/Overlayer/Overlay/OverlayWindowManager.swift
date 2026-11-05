@@ -14,6 +14,7 @@ final class OverlayWindowManager {
     private let loadingPresenter: LoadingPresenter
     private let relay = PassthroughRelay()
     private var sceneObservers: [any NSObjectProtocol] = []
+    private var announcedLoadingID: LoadingID?
 
     private lazy var toastSlot = OverlayWindowSlot(
         makeWindow: { [unowned self] scene in makeToastWindow(in: scene) },
@@ -73,16 +74,31 @@ final class OverlayWindowManager {
         guard let top = loadingPresenter.top else {
             // Stop blocking at once; the window itself stays until the removal animation has played (see hideLoadingIfIdle).
             window.isBlocking = false
+            if window.accessibilityViewIsModal {
+                window.accessibilityViewIsModal = false
+                OverlayAccessibility.screenChanged()
+            }
+            announcedLoadingID = nil
             return
         }
         let isBlocking = top.configuration.isBlocking
         let wasBlockingOnScreen = !window.isHidden && window.isBlocking
         window.isBlocking = isBlocking
         window.isHidden = false
+        // A blocking loader is modal for VoiceOver too, so the app beneath cannot be navigated; a non-blocking one leaves it reachable.
+        window.accessibilityViewIsModal = isBlocking
+        if isBlocking != wasBlockingOnScreen {
+            OverlayAccessibility.screenChanged()
+        }
         if isBlocking, !wasBlockingOnScreen {
             // The keyboard window sits above the loading window, so a focused field beneath a blocking loader would stay editable; drop focus when blocking begins.
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        if !isBlocking, top.id != announcedLoadingID {
+            // A non-blocking loader does not take VoiceOver focus, so it is announced instead.
+            OverlayAccessibility.announce(top.model.accessibilityAnnouncement)
+        }
+        announcedLoadingID = top.id
     }
 
     private func hideLoadingIfIdle() {

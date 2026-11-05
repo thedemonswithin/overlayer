@@ -14,10 +14,11 @@ let swiftSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "Overlayer",
+    defaultLocalization: "en",
     platforms: [.iOS(.v16)],
     products: [.library(name: "Overlayer", targets: ["Overlayer"])],
     targets: [
-        .target(name: "Overlayer", swiftSettings: swiftSettings),
+        .target(name: "Overlayer", resources: [.process("Resources")], swiftSettings: swiftSettings),
         .testTarget(name: "OverlayerTests", dependencies: ["Overlayer"], swiftSettings: swiftSettings)
     ],
     swiftLanguageModes: [.v6]

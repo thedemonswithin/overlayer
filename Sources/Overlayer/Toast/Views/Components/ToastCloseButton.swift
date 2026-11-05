@@ -25,6 +25,6 @@ public struct ToastCloseButton: View {
                 .background(.thinMaterial, in: Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text("Close"))
+        .accessibilityLabel(Text("Close", bundle: .module))
     }
 }
