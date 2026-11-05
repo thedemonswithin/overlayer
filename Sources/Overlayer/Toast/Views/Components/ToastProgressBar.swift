@@ -19,12 +19,22 @@ public struct ToastProgressBar: View {
 
     public var body: some View {
         TimelineView(.animation(minimumInterval: nil, paused: context.isPaused || !context.isProgressive)) { _ in
-            GeometryReader { proxy in
-                Rectangle()
-                    .fill(tint.opacity(context.isPaused ? 0.5 : 0.9))
-                    .frame(width: max(0, proxy.size.width * context.progress))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+            // Read the progress here, in the closure the timeline re-runs every frame, and hand it down as a value: a view whose inputs did not change (e.g. a GeometryReader holding only the context reference) is not re-evaluated, so the bar would only move when `isPaused` flips.
+            ProgressFill(progress: context.progress, tint: tint.opacity(context.isPaused ? 0.5 : 0.9))
+        }
+    }
+}
+
+private struct ProgressFill: View {
+    let progress: Double
+    let tint: Color
+
+    var body: some View {
+        GeometryReader { proxy in
+            Rectangle()
+                .fill(tint)
+                .frame(width: max(0, proxy.size.width * progress))
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
