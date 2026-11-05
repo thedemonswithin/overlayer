@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Assets/logo.png" alt="Overlayer" width="480">
+</p>
+
 # Overlayer
 
 Lightweight **toasts** and **loading** indicator **overlays** for SwiftUI / UIKit apps that float above *any* screen (including modals and alerts) on their own `UIWindow`:
