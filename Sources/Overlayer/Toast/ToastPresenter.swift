@@ -23,22 +23,19 @@ final class ToastPresenter: ObservableObject {
     var onSettled: (() -> Void)?
 
     private var queue: [ActiveToast] = []
-    private var tickTask: Task<Void, Never>?
-    private let tickInterval: TimeInterval = 1.0 / 60.0
+    /// One sleeping task per running auto-dismiss toast; nothing ticks.
+    private var expiryTasks: [ToastID: Task<Void, Never>] = [:]
 
     func present(_ toast: ActiveToast) {
         guard visible.count < containerConfiguration.maxVisibleCount else {
             queue.append(toast)
             return
         }
-        animate {
-            visible.append(toast)
-        }
-        toast.configuration.haptic.trigger()
-        startTickingIfNeeded()
+        show(toast)
     }
 
     func dismiss(id: ToastID) {
+        cancelExpiry(of: id)
         if let index = visible.firstIndex(where: { $0.id == id }) {
             animate {
                 _ = visible.remove(at: index)
@@ -50,6 +47,8 @@ final class ToastPresenter: ObservableObject {
     }
 
     func dismissAll() {
+        expiryTasks.values.forEach { $0.cancel() }
+        expiryTasks.removeAll()
         queue.removeAll()
         guard !visible.isEmpty else { return }
         animate {
@@ -58,63 +57,53 @@ final class ToastPresenter: ObservableObject {
     }
 
     func pause(id: ToastID) {
-        guard let toast = visible.first(where: { $0.id == id }), !toast.isPaused else { return }
-        toast.isPaused = true
-        toast.context.isPaused = true
+        guard let context = visible.first(where: { $0.id == id })?.context, !context.isPaused else { return }
+        context.timer.pause(at: context.clock())
+        context.isPaused = true
+        cancelExpiry(of: id)
     }
 
     func resume(id: ToastID) {
-        guard let toast = visible.first(where: { $0.id == id }), toast.isPaused else { return }
-        toast.isPaused = false
+        guard let toast = visible.first(where: { $0.id == id }), toast.context.isPaused else { return }
         toast.context.isPaused = false
+        startLifetime(of: toast)
+    }
+
+    // The lifetime starts when a toast becomes visible, so a queued toast keeps its full duration.
+    private func show(_ toast: ActiveToast) {
+        animate {
+            visible.append(toast)
+        }
+        toast.configuration.haptic.trigger()
+        startLifetime(of: toast)
     }
 
     private func pumpQueue() {
         while let next = queue.first, visible.count < containerConfiguration.maxVisibleCount {
             queue.removeFirst()
-            animate {
-                visible.append(next)
-            }
-            next.configuration.haptic.trigger()
+            show(next)
         }
-        startTickingIfNeeded()
     }
 
     private func animate(_ body: () -> Void) {
         OverlayAnimation.perform(containerConfiguration.animation, body) { [weak self] in self?.onSettled?() }
     }
 
-    private func startTickingIfNeeded() {
-        guard tickTask == nil, visible.contains(where: { $0.totalLifetime != nil }) else { return }
-        tickTask = Task { [weak self] in
-            var last = Date.now
-            while true {
-                let interval = self?.tickInterval ?? 0.05
-                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
-                guard let self, !Task.isCancelled else { return }
-                guard self.visible.contains(where: { $0.totalLifetime != nil }) else {
-                    self.tickTask = nil
-                    return
-                }
-                let now = Date.now
-                self.tick(delta: now.timeIntervalSince(last))
-                last = now
-            }
+    private func startLifetime(of toast: ActiveToast) {
+        let context = toast.context
+        context.timer.resume(at: context.clock())
+        cancelExpiry(of: toast.id)
+        guard let remaining = context.timer.remaining(at: context.clock()) else { return }
+        let id = toast.id
+        expiryTasks[id] = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            self?.expiryTasks[id] = nil
+            self?.dismiss(id: id)
         }
     }
 
-    private func tick(delta: TimeInterval) {
-        var expired: [ToastID] = []
-        for toast in visible {
-            guard let total = toast.totalLifetime, !toast.isPaused else { continue }
-            toast.elapsed += delta
-            toast.context.progress = max(0, 1 - toast.elapsed / total)
-            if toast.elapsed >= total {
-                expired.append(toast.id)
-            }
-        }
-        for id in expired {
-            dismiss(id: id)
-        }
+    private func cancelExpiry(of id: ToastID) {
+        expiryTasks.removeValue(forKey: id)?.cancel()
     }
 }

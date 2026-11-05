@@ -6,9 +6,9 @@
 //
 
 public import Combine
-import SwiftUI
+import Foundation
 
-/// Live handle handed to every toast view. It exposes imperative controls (`dismiss`, `pause`, `resume`) and observable state (`progress`, `isPaused`) so a custom view can render its own chrome, while the bundled `ToastCard` consumes the very same context.
+/// Live handle handed to every toast view. It exposes imperative controls (`dismiss`, `pause`, `resume`) and state (`progress`, `isPaused`) so a custom view can render its own chrome, while the bundled `ToastCard` consumes the very same context.
 public final class ToastContext: ObservableObject {
     /// Identifier of the presentation this context drives.
     public let id: ToastID
@@ -18,21 +18,30 @@ public final class ToastContext: ObservableObject {
     public let showsProgressBar: Bool
     /// `true` when the toast auto-dismisses (non-sticky); progress is only meaningful then.
     public let isProgressive: Bool
-    /// Remaining fraction of the lifetime, draining from 1 to 0.
-    @Published public internal(set) var progress: Double = 1
-    /// `true` while the lifetime is paused (e.g. held under a finger).
+    /// `true` while the lifetime is paused (e.g. held under a finger). Published, so views update when it flips.
     @Published public internal(set) var isPaused: Bool = false
+
+    /// Remaining fraction of the lifetime, draining from 1 to 0 (always 1 for a sticky toast).
+    ///
+    /// Computed on read rather than published on every frame: to animate it, read it inside a `TimelineView(.animation(paused: context.isPaused))`, as `ToastProgressBar` does.
+    public var progress: Double { timer.progress(at: clock()) }
+
+    var timer: ToastTimer
+    let clock: () -> TimeInterval
     private weak var presenter: ToastPresenter?
 
     init(
         id: ToastID,
         configuration: ToastConfiguration,
-        presenter: ToastPresenter
+        presenter: ToastPresenter,
+        clock: @escaping () -> TimeInterval = OverlayClock.now
     ) {
         self.id = id
         self.showsCloseButton = configuration.showsCloseButton
         self.showsProgressBar = configuration.showsProgressBar
         self.isProgressive = configuration.lifetime.duration != nil
+        self.timer = ToastTimer(total: configuration.lifetime.duration)
+        self.clock = clock
         self.presenter = presenter
     }
 

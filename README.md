@@ -17,7 +17,8 @@ Highlights:
 - Toasts queue past a max visible count; per-toast `position` renders top / bottom / center in separate containers simultaneously.
 - Pause a toast to read it — tap to toggle, or press-and-hold — then swipe toward the edge to dismiss (with a rubber-band pull).
 - Loading blocks input by default, or passes touches through parametrically; indeterminate spinner and determinate progress out of the box.
-- Built-in **close button** and bottom **progress bar** chrome, or render your own from the `ToastContext`.
+- Built-in **close button** and bottom **progress bar** chrome, or render your own from the `ToastContext` (read `context.progress` inside a `TimelineView(.animation(paused: context.isPaused))` to animate it).
+- Lifetimes run on a monotonic clock with one sleeping task per toast — nothing ticks, and a paused toast costs nothing.
 - Register a model + view **independently** for any type — no enums, no switch — via one generic registry.
 
 ## Quick start

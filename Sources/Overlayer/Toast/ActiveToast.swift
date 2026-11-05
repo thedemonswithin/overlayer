@@ -7,16 +7,13 @@
 
 import SwiftUI
 
-// One live presentation: the model, its resolved view, the context, and the lifetime bookkeeping the presenter advances on every tick.
+// One live presentation: the model, its resolved view, and the context that also carries its lifetime timer.
 final class ActiveToast: Identifiable {
     let id: ToastID
     let model: any ToastModel
     let configuration: ToastConfiguration
     let context: ToastContext
     let content: AnyView
-    let totalLifetime: TimeInterval?
-    var elapsed: TimeInterval = 0
-    var isPaused = false
 
     init(
         id: ToastID,
@@ -30,6 +27,5 @@ final class ActiveToast: Identifiable {
         self.configuration = configuration
         self.context = context
         self.content = content
-        self.totalLifetime = configuration.lifetime.duration
     }
 }
