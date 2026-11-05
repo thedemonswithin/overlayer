@@ -4,27 +4,27 @@
 
 # Overlayer
 
-Lightweight **toasts** and **loading** indicator **overlays** for SwiftUI / UIKit apps that float above *any* screen (including modals and alerts) on their own `UIWindow`:
+Toasts and loading overlays for SwiftUI and UIKit apps. They live in their own windows, so they show above any screen, sheet or alert, and you can call them from anywhere.
 
-- **Toasts** sit on a *passthrough* window that never blocks the underlying interface; each toast still handles its own taps, buttons, and gestures.
-- **Loading** sits on a *blocking* window that swallows every touch on the views beneath it (or passes them through, if you ask).
+- **Toasts** never block the app: touches outside a toast go straight through.
+- **Loading** blocks the screen until you hide it (or lets touches through, if you ask).
+- Any model type can have its own view. Ready-made Success / Error / Info / Warning toasts and a spinner / progress loader are included.
 
-Highlights:
+iOS 16+, no dependencies.
 
-- iOS 16+, Swift 6 (tools 6.4) with strict concurrency, zero third-party dependencies, pure Swift.
-- One service, two narrow protocols: inject `ToastPresenting`, `LoadingPresenting`, or the combined `OverlayService`.
-- Setup (view registration + global config) lives on the `Overlayer` facade; runtime (`show` / `dismiss`) on the injected service.
-- Toasts queue past a max visible count; per-toast `position` renders top / bottom / center in separate containers simultaneously.
-- Pause a toast to read it — tap to toggle, or press-and-hold — then swipe toward the edge to dismiss (with a rubber-band pull).
-- Loading blocks input by default, or passes touches through parametrically; indeterminate spinner and determinate progress out of the box.
-- Built-in **close button** and bottom **progress bar** chrome, or render your own from the `ToastContext` (read `context.progress` inside a `TimelineView(.animation(paused: context.isPaused))` to animate it).
-- Lifetimes run on a monotonic clock with one sleeping task per toast — nothing ticks, and a paused toast costs nothing.
-- Register a model + view **independently** for any type — no enums, no switch — via one generic registry.
-- Ready-made Success / Error / Info / Warning toasts and spinner / progress loaders live in the optional `OverlayerDefaults` product.
+## Installation
+
+Swift Package Manager:
+
+```swift
+.package(url: "https://github.com/thedemonswithin/overlayer.git", from: "2.0.0")
+```
+
+Add `Overlayer` to your target, and `OverlayerDefaults` if you want the ready-made views. The package builds with Xcode and Swift 6.4. Coming from 1.x? See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 
-Register the view types you use once (e.g. in your `App` init). The ready-made views come from the optional `OverlayerDefaults` product; skip it if you register only your own. The overlay windows are created lazily on first use, so there is nothing else to wire up.
+Register views once at startup, then show overlays from anywhere:
 
 ```swift
 import Overlayer
@@ -33,150 +33,114 @@ import OverlayerDefaults
 @main
 struct DemoApp: App {
     init() {
-        Overlayer.registerDefaultToasts()     // Success / Error / Info / Warning
-        Overlayer.registerDefaultLoading()    // spinner + determinate progress
+        Overlayer.registerDefaultToasts()
+        Overlayer.registerDefaultLoading()
     }
-    
+
     var body: some Scene {
-        WindowGroup { 
-            ContentView() 
-        }
+        WindowGroup { ContentView() }
     }
 }
 ```
-
-### Toasts
-
-Show a registered toast from anywhere via the service:
 
 ```swift
 Overlayer.service.show(SuccessToastModel(message: "Saved"))
 
-// per-call configuration; different positions show at the same time, in separate containers
-Overlayer.service.show(ErrorToastModel(message: "Upload failed"), configuration: ToastConfiguration(position: .top, lifetime: .seconds(6)))
-Overlayer.service.show(SuccessToastModel(message: "Draft saved"), configuration: ToastConfiguration(position: .bottom))
-```
-
-Toasts past the visible limit queue automatically. A toast can be paused to read it (a tap toggles pause, press-and-hold pauses while held), swiped toward its edge to dismiss, or closed via the built-in close button.
-
-Register your own model + view — fully decoupled, no enums:
-
-```swift
-struct DownloadToastModel: ToastModel {
-    let fileName: String
-    let onOpen: () -> Void
-}
-
-struct DownloadToastView: View {
-    let model: DownloadToastModel
-    let context: ToastContext
-    var body: some View {
-        ToastCard(context: context, accent: .indigo) {     // bundled chrome: close button + progress bar
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Downloaded \(model.fileName)").font(.subheadline.weight(.semibold))
-                Button("Open") { model.onOpen(); context.dismiss() }
-                    .buttonStyle(.borderedProminent)
-            }
-        }
-    }
-}
-
-Overlayer.registerToast(DownloadToastModel.self) { model, context in
-    DownloadToastView(model: model, context: context)
-}
-```
-
-### Loading
-
-A loading overlay blocks interaction until hidden; overlays stack, so nested loads are supported.
-
-```swift
 let id = Overlayer.service.showLoading(SpinnerLoadingModel(message: "Loading…"))
-Overlayer.service.hideLoading(id)        // or hideAllLoading()
-```
-
-Determinate progress (file up/download) uses an observable you keep and update live:
-
-```swift
-let progress = LoadingProgress(message: "Uploading…")
-let id = Overlayer.service.showLoading(ProgressLoadingModel(progress: progress))
-progress.fraction = 0.4                    // updates the bar in place
-progress.message = "Almost done…"
 Overlayer.service.hideLoading(id)
 ```
 
-Non-blocking (visual-only) — the spinner shows but the screen stays interactive:
+## Toasts
 
 ```swift
-Overlayer.service.showLoading(
-    SpinnerLoadingModel(message: "Syncing…"),
-    configuration: LoadingConfiguration(isBlocking: false, backgroundStyle: AnyShapeStyle(Color.clear))
+Overlayer.service.show(
+    ErrorToastModel(title: "Upload failed", message: "Check your connection"),
+    configuration: ToastConfiguration(position: .top, lifetime: .seconds(6))
 )
 ```
 
-Custom loading views register the same way via `Overlayer.registerLoading(_:content:)`; their `LoadingContext` can `dismiss()` (e.g. a Cancel button in blocking mode).
+- Top, center and bottom toasts can be on screen at the same time; extra toasts wait in a queue.
+- A toast hides itself after its lifetime, or stays until closed with `.sticky`.
+- Users can close a toast with its button or a swipe, and pause it with a hold or a tap (swipe and tap are opt-in).
+- `Overlayer.service.dismiss(id)` and `dismissAll()` close toasts from code.
 
-## Configuration
+### Your own toast
 
-### Toasts
-
-Stack-wide layout is set once on the facade; per-toast behaviour travels with each toast (or comes from a default).
-
-```swift
-Overlayer.toastContainerConfiguration = ToastContainerConfiguration(maxVisibleCount: 4, spacing: 8)
-Overlayer.defaultToastConfiguration = ToastConfiguration(haptic: .notification(.success))
-```
-
-- **`ToastContainerConfiguration`** — the group, set via `Overlayer.toastContainerConfiguration`: `maxVisibleCount` (total across all positions), `spacing`, `edgeInsets`, `animation`. Toasts fill the available width minus `edgeInsets`.
-- **`ToastConfiguration`** — one toast, passed to `show` (or `Overlayer.defaultToastConfiguration`): `position` (`.top` / `.bottom` / `.center`), `lifetime` (`.seconds(_)` / `.sticky`), `haptic`, `isSwipeToDismissEnabled`, `isTapToPauseEnabled`, `isHoldToPauseEnabled`, `showsCloseButton`, `showsProgressBar`.
-
-### Loading
-
-```swift
-Overlayer.loadingConfiguration = LoadingConfiguration(backgroundStyle: AnyShapeStyle(.ultraThinMaterial))
-```
-
-- **`LoadingConfiguration`** — passed to `showLoading` (or `Overlayer.loadingConfiguration`): `isBlocking` (default `true`; `false` lets touches pass straight through), `backgroundStyle`, `ignoresSafeArea`, `animation`.
-
-## Accessibility
-
-- **VoiceOver announcements.** A toast is announced when it becomes visible, using its model's `accessibilityAnnouncement` (default `nil`; the bundled models announce their title and message):
+A toast is a plain model plus any SwiftUI view. `ToastCard` gives you the standard look with a close button and a progress bar:
 
 ```swift
 struct DownloadToastModel: ToastModel {
     let fileName: String
     var accessibilityAnnouncement: String? { "Downloaded \(fileName)" }
 }
+
+Overlayer.registerToast(DownloadToastModel.self) { model, context in
+    ToastCard(context: context, accent: .indigo) {
+        HStack {
+            Text("Downloaded \(model.fileName)")
+            Button("Open") { context.dismiss() }
+        }
+    }
+}
 ```
 
-- **Gestures as actions.** Swipe, tap and hold are not reachable with VoiceOver, so every toast offers *Dismiss* and *Pause* / *Resume* actions; the escape gesture (two-finger scrub) dismisses it.
-- **Blocking loader is modal.** While a blocking loader is up, VoiceOver cannot reach the screen beneath, and focus moves to the loader and back when it hides. A non-blocking loader is announced via `LoadingModel.accessibilityAnnouncement` instead.
-- **Reduce Motion.** Toasts fade instead of sliding or scaling.
-- **Localization.** Built-in strings ship in English and Russian; they follow your app's localizations, so add Russian to the app to get them.
+The `context` lets the view `dismiss()`, `pause()` and `resume()` its toast.
 
-## Installation
+## Loading
 
-Swift Package Manager — add the dependency in `Package.swift`:
+Loading overlays stack, so nested loads work: the newest one is shown, and the screen stays blocked until the last one is hidden.
 
 ```swift
-dependencies: [
-    .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "2.0.0")
-]
+// Determinate progress you update as the work goes
+let progress = LoadingProgress(message: "Uploading…")
+let id = Overlayer.service.showLoading(ProgressLoadingModel(progress: progress))
+progress.fraction = 0.4
+Overlayer.service.hideLoading(id)
+
+// Visual only: the screen stays interactive
+Overlayer.service.showLoading(
+    SpinnerLoadingModel(message: "Syncing…"),
+    configuration: LoadingConfiguration(isBlocking: false, backgroundStyle: AnyShapeStyle(Color.clear))
+)
 ```
 
-…and list `Overlayer` (plus `OverlayerDefaults` if you want the ready-made views) among your target's dependencies. Building the package requires Xcode with Swift 6.4; apps may target iOS 16+. Upgrading from 1.x: see [CHANGELOG.md](CHANGELOG.md). In Xcode: **File ▸ Add Package Dependencies…** and paste `https://github.com/thedemonswithin/overlayer.git`. 
+Custom loaders register with `Overlayer.registerLoading(_:content:)`. Their `LoadingContext` can `dismiss()`, for example from a Cancel button.
 
-## Notes
+## Configuration
 
-- Services, views and contexts are `@MainActor`; call them from the main actor (UI code already is). Configuration values and ids (`ToastConfiguration`, `ToastContainerConfiguration`, `LoadingConfiguration`, `ToastID`, `LoadingID`, …) are `nonisolated` and `Sendable`, so they can be built anywhere.
-- Window levels: loading sits just above the app and its sheets (below system alerts and the keyboard); toasts sit above everything, so a toast can appear over a loading overlay.
-- A non-blocking loading overlay passes every touch through (visual-only) — keep interactive controls (e.g. a Cancel button) for the default blocking mode.
-- A blocking loading overlay ends text editing when it appears, since the keyboard sits above it.
-- Overlay windows are shown only while they have content and are hidden once the last toast or loader has animated away.
-- Status bar style and visibility, home indicator, and supported orientations follow your app's visible screen even while an overlay is up.
-- On multi-window / iPad setups the overlays attach to the foreground-active `UIWindowScene` and move to another one if their scene is disconnected or goes to the background.
-- **DI-friendly (e.g. DITranquility).** `OverlayServiceImpl.shared` conforms to `OverlayService` (and the narrower `ToastPresenting` / `LoadingPresenting`). Register the shared instance once and inject whichever protocol a screen needs:
+Set defaults once; pass a configuration to a single `show` / `showLoading` to override them.
 
 ```swift
-container.register { OverlayServiceImpl.shared as OverlayService }.lifetime(.perContainer)
+Overlayer.toastContainerConfiguration = ToastContainerConfiguration(maxVisibleCount: 4)
+Overlayer.defaultToastConfiguration = ToastConfiguration(haptic: .notification(.success))
+Overlayer.loadingConfiguration = LoadingConfiguration(backgroundStyle: AnyShapeStyle(.ultraThinMaterial))
 ```
+
+| Type | Options |
+|---|---|
+| `ToastContainerConfiguration` | `maxVisibleCount`, `spacing`, `edgeInsets`, `animation` |
+| `ToastConfiguration` | `position`, `lifetime`, `haptic`, `isSwipeToDismissEnabled`, `isTapToPauseEnabled`, `isHoldToPauseEnabled`, `showsCloseButton`, `showsProgressBar` |
+| `LoadingConfiguration` | `isBlocking`, `backgroundStyle`, `ignoresSafeArea`, `animation` |
+
+## Accessibility
+
+- VoiceOver reads a toast when it appears, using the model's `accessibilityAnnouncement`. The ready-made models fill it in for you.
+- Every toast has *Dismiss* and *Pause* / *Resume* actions, and the escape gesture closes it.
+- While a blocking loader is up, VoiceOver stays inside it.
+- With Reduce Motion on, toasts fade instead of sliding.
+- Built-in strings are in English and Russian.
+
+## Good to know
+
+- Call the API from the main actor. Configurations and ids are `Sendable` and can be created anywhere.
+- A model is shown only if a view is registered for its exact type. A missing registration stops at an assertion in debug and is logged in release.
+- The status bar, home indicator and rotation follow your app while an overlay is visible.
+- With dependency injection, register `OverlayServiceImpl.shared` and inject `OverlayService`, `ToastPresenting` or `LoadingPresenting`:
+
+```swift
+container.register { OverlayServiceImpl.shared as OverlayService }
+```
+
+## Example
+
+`Example/` contains a demo app with every feature. Open `Example/OverlayerExample.xcodeproj` and run it.
