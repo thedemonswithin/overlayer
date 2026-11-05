@@ -46,4 +46,25 @@ import XCTest
         presenter.hideAll()
         XCTAssertTrue(presenter.stack.isEmpty)
     }
+
+    // Regression: a loading view dismissing itself (e.g. a Cancel button) must notify the window manager, otherwise the blocking window stays up over an empty stack.
+    func testContextDismissRemovesAndNotifies() {
+        let presenter = LoadingPresenter()
+        var changes = 0
+        presenter.onChange = { changes += 1 }
+        let loading = makeLoading(on: presenter)
+        presenter.present(loading)
+        XCTAssertEqual(changes, 1)
+        loading.context.dismiss()
+        XCTAssertTrue(presenter.stack.isEmpty)
+        XCTAssertEqual(changes, 2)
+    }
+
+    func testHideUnknownIdDoesNotNotify() {
+        let presenter = LoadingPresenter()
+        var changes = 0
+        presenter.onChange = { changes += 1 }
+        presenter.hide(id: LoadingID())
+        XCTAssertEqual(changes, 0)
+    }
 }

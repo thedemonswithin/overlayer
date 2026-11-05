@@ -57,4 +57,22 @@ import XCTest
         presenter.resume(id: toast.id)
         XCTAssertFalse(toast.context.isPaused)
     }
+
+    func testRaisingLimitPromotesQueuedToasts() {
+        let presenter = makePresenter(maxVisible: 1)
+        let toasts = (0..<3).map { _ in makeToast(on: presenter) }
+        toasts.forEach { presenter.present($0) }
+        XCTAssertEqual(presenter.visible.map(\.id), [toasts[0].id])
+        presenter.containerConfiguration.maxVisibleCount = 3
+        XCTAssertEqual(presenter.visible.map(\.id), toasts.map(\.id))
+    }
+
+    func testDismissQueuedToastRemovesItFromQueue() {
+        let presenter = makePresenter(maxVisible: 1)
+        let toasts = (0..<3).map { _ in makeToast(on: presenter) }
+        toasts.forEach { presenter.present($0) }
+        presenter.dismiss(id: toasts[1].id)
+        presenter.dismiss(id: toasts[0].id)
+        XCTAssertEqual(presenter.visible.map(\.id), [toasts[2].id])
+    }
 }

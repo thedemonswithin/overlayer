@@ -12,11 +12,13 @@ import Combine
 @MainActor final class LoadingPresenter: ObservableObject {
     @Published private(set) var stack: [ActiveLoading] = []
     var top: ActiveLoading? { stack.last }
+    var onChange: (() -> Void)?
     
     func present(_ loading: ActiveLoading) {
         withAnimation(loading.configuration.animation) {
             stack.append(loading)
         }
+        onChange?()
     }
     
     func hide(id: LoadingID) {
@@ -25,6 +27,7 @@ import Combine
         withAnimation(animation) {
             _ = stack.remove(at: index)
         }
+        onChange?()
     }
     
     func hideAll() {
@@ -32,5 +35,6 @@ import Combine
         withAnimation(animation) {
             stack.removeAll()
         }
+        onChange?()
     }
 }

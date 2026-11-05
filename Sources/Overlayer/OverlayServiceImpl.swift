@@ -76,11 +76,9 @@ import SwiftUI
 
     public func hideLoading(_ id: LoadingID) {
         loadingPresenter.hide(id: id)
-        windowManager.syncLoading()
     }
 
     public func hideAllLoading() {
         loadingPresenter.hideAll()
-        windowManager.syncLoading()
     }
 }

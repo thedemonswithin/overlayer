@@ -10,7 +10,10 @@ import SwiftUI
 
 @MainActor final class ToastPresenter: ObservableObject {
     @Published private(set) var visible: [ActiveToast] = []
-    @Published var containerConfiguration: ToastContainerConfiguration = .default
+    @Published var containerConfiguration: ToastContainerConfiguration = .default {
+        // A raised limit frees slots immediately; without this, queued toasts would wait for the next dismissal.
+        didSet { pumpQueue() }
+    }
 
     private var queue: [ActiveToast] = []
     private var tickTask: Task<Void, Never>?

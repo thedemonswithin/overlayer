@@ -1,0 +1,34 @@
+name: OverlayerExample
+options:
+  bundleIdPrefix: com.thedemonswithin.overlayer
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+packages:
+  Overlayer:
+    path: ..
+targets:
+  OverlayerExample:
+    type: application
+    platform: iOS
+    sources:
+      - OverlayerExample
+    dependencies:
+      - package: Overlayer
+        product: Overlayer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.thedemonswithin.overlayer.example
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+schemes:
+  OverlayerExample:
+    build:
+      targets:
+        OverlayerExample: all
+    run:
+      config: Debug

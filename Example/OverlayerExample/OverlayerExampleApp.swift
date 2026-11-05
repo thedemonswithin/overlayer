@@ -1,0 +1,29 @@
+//
+//  OverlayerExampleApp.swift
+//  OverlayerExample
+//
+//  Created by Evgeny Blinov on 10.06.2026.
+//
+
+import Overlayer
+import SwiftUI
+
+@main
+struct OverlayerExampleApp: App {
+    init() {
+        Overlayer.registerExampleToasts()
+        Overlayer.registerExampleLoading()
+        Overlayer.registerToast(DownloadToastModel.self) { model, context in
+            DownloadToastView(model: model, context: context)
+        }
+        Overlayer.registerLoading(BrandedLoadingModel.self) { model, context in
+            BrandedLoadingView(model: model, context: context)
+        }
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}

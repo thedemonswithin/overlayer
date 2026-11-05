@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// Renders the loading overlay inside its window: a full-screen backdrop plus the most recent loading view centred on top. Hit-testing is enabled only in blocking mode; when the top loading is non-blocking the whole overlay opts out so its window lets touches fall through.
+// Renders the loading overlay inside its window: a full-screen backdrop plus the most recent loading view centred on top. Whether touches are blocked or passed through is decided by the window (from the top overlay's isBlocking), not here.
 struct LoadingHostView: View {
     @ObservedObject var presenter: LoadingPresenter
 
@@ -20,11 +20,12 @@ struct LoadingHostView: View {
                     .contentShape(Rectangle())
                     .transition(.opacity)
                 top.content
+                    // A new identity per presentation, so a nested overlay replacing the top one cross-fades instead of swapping in place.
+                    .id(top.id)
                     .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .allowsHitTesting(presenter.top?.configuration.isBlocking ?? true)
         .animation(presenter.top?.configuration.animation, value: presenter.stack.count)
     }
 }

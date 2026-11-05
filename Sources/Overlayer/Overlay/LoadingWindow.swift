@@ -7,10 +7,11 @@
 
 import UIKit
 
-// Window for the loading overlay. In blocking mode the hosted content is hit-testable and captures every touch; in non-blocking mode the content opts out of hit-testing (via SwiftUI's allowsHitTesting), so super.hitTest resolves to the window itself and we return nil to let the touch fall through to the app below.
+// Window for the loading overlay. In blocking mode it captures every touch (the backdrop swallows them, while the loading view's own controls still work); when the current overlay is non-blocking, hitTest returns nil so touches fall straight through to the app below. `isBlocking` is kept in sync with the top overlay by OverlayWindowManager — deciding at the window level is robust against UIHostingController reporting its root view as the hit for every point.
 final class LoadingWindow: UIWindow {
+    var isBlocking = true
+
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let hit = super.hitTest(point, with: event)
-        return hit === self ? nil : hit
+        isBlocking ? super.hitTest(point, with: event) : nil
     }
 }
