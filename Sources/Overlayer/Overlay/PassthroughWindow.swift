@@ -16,7 +16,7 @@ final class PassthroughRelay: @unchecked Sendable {
     }
 }
 /// Window that captures a touch only when it lands on a toast card, and lets every other touch fall through to the app below — so the rest of the interface stays fully interactive while toasts still receive their own taps, buttons, and gestures. Relying on the reported card frames is robust against `UIHostingController` returning its root view for every point.
-final class PassthroughWindow: UIWindow {
+final class PassthroughWindow: UIWindow, OverlayWindow {
     private let relay: PassthroughRelay
     
     init(windowScene: UIWindowScene, relay: PassthroughRelay) {

@@ -67,4 +67,17 @@ import XCTest
         presenter.hide(id: LoadingID())
         XCTAssertEqual(changes, 0)
     }
+
+    // The window manager hides the loading window only on this signal, so it must arrive after a removal.
+    func testHideReportsSettled() {
+        let presenter = LoadingPresenter()
+        let loading = makeLoading(on: presenter)
+        presenter.present(loading)
+        let settled = expectation(description: "settled after hide")
+        presenter.onSettled = {
+            if presenter.stack.isEmpty { settled.fulfill() }
+        }
+        presenter.hide(id: loading.id)
+        wait(for: [settled], timeout: 2)
+    }
 }

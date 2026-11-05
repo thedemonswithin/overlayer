@@ -9,11 +9,18 @@ import Combine
 import SwiftUI
 
 @MainActor final class ToastPresenter: ObservableObject {
-    @Published private(set) var visible: [ActiveToast] = []
+    @Published private(set) var visible: [ActiveToast] = [] {
+        didSet { onChange?() }
+    }
     @Published var containerConfiguration: ToastContainerConfiguration = .default {
         // A raised limit frees slots immediately; without this, queued toasts would wait for the next dismissal.
         didSet { pumpQueue() }
     }
+
+    /// Called synchronously whenever the visible set changes.
+    var onChange: (() -> Void)?
+    /// Called once the animation of a visible-set change has played out.
+    var onSettled: (() -> Void)?
 
     private var queue: [ActiveToast] = []
     private var tickTask: Task<Void, Never>?
@@ -24,7 +31,7 @@ import SwiftUI
             queue.append(toast)
             return
         }
-        withAnimation(containerConfiguration.animation) {
+        animate {
             visible.append(toast)
         }
         toast.configuration.haptic.trigger()
@@ -33,7 +40,7 @@ import SwiftUI
 
     func dismiss(id: ToastID) {
         if let index = visible.firstIndex(where: { $0.id == id }) {
-            withAnimation(containerConfiguration.animation) {
+            animate {
                 _ = visible.remove(at: index)
             }
             pumpQueue()
@@ -44,7 +51,8 @@ import SwiftUI
 
     func dismissAll() {
         queue.removeAll()
-        withAnimation(containerConfiguration.animation) {
+        guard !visible.isEmpty else { return }
+        animate {
             visible.removeAll()
         }
     }
@@ -64,12 +72,16 @@ import SwiftUI
     private func pumpQueue() {
         while let next = queue.first, visible.count < containerConfiguration.maxVisibleCount {
             queue.removeFirst()
-            withAnimation(containerConfiguration.animation) {
+            animate {
                 visible.append(next)
             }
             next.configuration.haptic.trigger()
         }
         startTickingIfNeeded()
+    }
+
+    private func animate(_ body: () -> Void) {
+        OverlayAnimation.perform(containerConfiguration.animation, body) { [weak self] in self?.onSettled?() }
     }
 
     private func startTickingIfNeeded() {

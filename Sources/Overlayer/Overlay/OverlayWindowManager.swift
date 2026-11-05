@@ -8,67 +8,73 @@
 import SwiftUI
 import UIKit
 
-// Single manager for every overlay window. Lazily mounts a passthrough window for toasts (above alerts) and a loading window (above the app and its sheets, below system alerts; blocking by default, pass-through when configured), each created on first use. Adding a new overlay kind means adding one window here, not a parallel manager.
+// Single manager for every overlay window: a passthrough window for toasts (above alerts) and a loading window (above the app and its sheets, below system alerts; blocking by default, pass-through when configured). Each window is created on first use, shown while it has content, and hidden once its dismissal animation has played out. Adding a new overlay kind means adding one slot here, not a parallel manager.
 @MainActor final class OverlayWindowManager {
     private let toastPresenter: ToastPresenter
     private let loadingPresenter: LoadingPresenter
     private let relay = PassthroughRelay()
-    private var toastWindow: PassthroughWindow?
-    private var loadingWindow: LoadingWindow?
-    private var sceneObserver: NSObjectProtocol?
-    private var pendingToasts = false
-    private var pendingLoading = false
-    private var hideLoadingTask: Task<Void, Never>?
-    /// How long the loading window stays visible (non-blocking) after the stack empties, so the dismissal animation can finish. Covers the default 0.2s ease plus typical springs.
-    private static let loadingHideDelay: TimeInterval = 0.5
+    private var sceneObservers: [NSObjectProtocol] = []
+
+    private lazy var toastSlot = OverlayWindowSlot(
+        makeWindow: { [unowned self] scene in makeToastWindow(in: scene) },
+        onInstall: { [unowned self] _ in syncToasts() }
+    )
+    private lazy var loadingSlot = OverlayWindowSlot(
+        makeWindow: { [unowned self] scene in makeLoadingWindow(in: scene) },
+        onInstall: { [unowned self] _ in syncLoading() }
+    )
 
     init(toastPresenter: ToastPresenter, loadingPresenter: LoadingPresenter) {
         self.toastPresenter = toastPresenter
         self.loadingPresenter = loadingPresenter
+        toastPresenter.onChange = { [weak self] in self?.syncToasts() }
+        toastPresenter.onSettled = { [weak self] in self?.hideToastsIfIdle() }
         loadingPresenter.onChange = { [weak self] in self?.syncLoading() }
+        loadingPresenter.onSettled = { [weak self] in self?.hideLoadingIfIdle() }
+        sceneObservers = [
+            OverlayScene.observe(UIScene.didActivateNotification) { [weak self] scene in
+                self?.toastSlot.sceneDidActivate(scene)
+                self?.loadingSlot.sceneDidActivate(scene)
+            },
+            OverlayScene.observe(UIScene.didDisconnectNotification) { [weak self] scene in
+                self?.toastSlot.sceneDidDisconnect(scene)
+                self?.loadingSlot.sceneDidDisconnect(scene)
+            }
+        ]
     }
 
     func activateToasts() {
-        guard toastWindow == nil else { return }
-        if let scene = OverlayScene.active {
-            installToasts(in: scene)
-        } else {
-            pendingToasts = true
-            observeSceneIfNeeded()
-        }
+        toastSlot.prepare()
     }
 
     func showLoading() {
-        guard loadingWindow == nil else {
-            syncLoading()
-            return
-        }
-        if let scene = OverlayScene.active {
-            installLoading(in: scene)
-        } else {
-            pendingLoading = true
-            observeSceneIfNeeded()
-        }
+        loadingSlot.prepare()
+        syncLoading()
     }
 
-    // Keeps the loading window in step with the presenter's stack. Called on every stack change (via `onChange`) and after the window is installed.
-    func syncLoading() {
-        hideLoadingTask?.cancel()
-        hideLoadingTask = nil
-        guard let window = loadingWindow else { return }
+    // MARK: - Toasts
 
+    private func syncToasts() {
+        guard let window = toastSlot.window, !toastPresenter.visible.isEmpty else { return }
+        window.isHidden = false
+    }
+
+    // An empty toast window would still be the frontmost one, so it is taken off screen once the last toast has animated away.
+    private func hideToastsIfIdle() {
+        guard toastPresenter.visible.isEmpty else { return }
+        toastSlot.window?.isHidden = true
+    }
+
+    // MARK: - Loading
+
+    // Keeps the loading window in step with the presenter's stack. Called on every stack change and after the window is installed.
+    private func syncLoading() {
+        guard let window = loadingSlot.window else { return }
         guard let top = loadingPresenter.top else {
-            // Stop blocking at once, but keep the window on screen until the removal animation has played; hiding it synchronously would cut the fade-out.
+            // Stop blocking at once; the window itself stays until the removal animation has played (see hideLoadingIfIdle).
             window.isBlocking = false
-            hideLoadingTask = Task { @MainActor [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(Self.loadingHideDelay * 1_000_000_000))
-                guard let self, !Task.isCancelled, self.loadingPresenter.stack.isEmpty else { return }
-                self.loadingWindow?.isHidden = true
-                self.hideLoadingTask = nil
-            }
             return
         }
-
         let isBlocking = top.configuration.isBlocking
         let wasBlockingOnScreen = !window.isHidden && window.isBlocking
         window.isBlocking = isBlocking
@@ -79,49 +85,33 @@ import UIKit
         }
     }
 
-    private func observeSceneIfNeeded() {
-        guard sceneObserver == nil else { return }
-        sceneObserver = OverlayScene.observeActivation { [weak self] scene in
-            guard let self else { return }
-            if pendingToasts {
-                installToasts(in: scene)
-                pendingToasts = false
-            }
-            if pendingLoading {
-                installLoading(in: scene)
-                pendingLoading = false
-            }
-            if let sceneObserver {
-                NotificationCenter.default.removeObserver(sceneObserver)
-                self.sceneObserver = nil
-            }
-        }
+    private func hideLoadingIfIdle() {
+        guard loadingPresenter.stack.isEmpty else { return }
+        loadingSlot.window?.isHidden = true
     }
 
-    private func installToasts(in scene: UIWindowScene) {
-        guard toastWindow == nil else { return }
+    // MARK: - Window factories
+
+    private func makeToastWindow(in scene: UIWindowScene) -> PassthroughWindow {
         let window = PassthroughWindow(windowScene: scene, relay: relay)
         window.windowLevel = UIWindow.Level(rawValue: UIWindow.Level.alert.rawValue + 1)
         window.backgroundColor = .clear
-        let host = UIHostingController(rootView: ToastHostView(presenter: toastPresenter, relay: relay))
+        let host = OverlayHostingController(rootView: ToastHostView(presenter: toastPresenter, relay: relay))
         host.view.backgroundColor = .clear
         window.rootViewController = host
-        window.isHidden = false
-        toastWindow = window
+        window.isHidden = true
+        return window
     }
 
-    private func installLoading(in scene: UIWindowScene) {
-        guard loadingWindow == nil else { return }
+    private func makeLoadingWindow(in scene: UIWindowScene) -> LoadingWindow {
         let window = LoadingWindow(windowScene: scene)
         window.windowLevel = UIWindow.Level(rawValue: UIWindow.Level.normal.rawValue + 1)
         window.backgroundColor = .clear
         window.isBlocking = false
-        let host = UIHostingController(rootView: LoadingHostView(presenter: loadingPresenter))
+        let host = OverlayHostingController(rootView: LoadingHostView(presenter: loadingPresenter))
         host.view.backgroundColor = .clear
         window.rootViewController = host
         window.isHidden = true
-        loadingWindow = window
-        // Visibility, blocking and keyboard dismissal are all decided in one place.
-        syncLoading()
+        return window
     }
 }

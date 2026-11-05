@@ -148,7 +148,10 @@ dependencies: [
 - All API is `@MainActor`; call it from the main actor (UI code already is).
 - Window levels: loading sits just above the app and its sheets (below system alerts and the keyboard); toasts sit above everything, so a toast can appear over a loading overlay.
 - A non-blocking loading overlay passes every touch through (visual-only) — keep interactive controls (e.g. a Cancel button) for the default blocking mode.
-- On multi-window / iPad setups the overlays attach to the first foreground-active `UIWindowScene`.
+- A blocking loading overlay ends text editing when it appears, since the keyboard sits above it.
+- Overlay windows are shown only while they have content and are hidden once the last toast or loader has animated away.
+- Status bar style and visibility, home indicator, and supported orientations follow your app's visible screen even while an overlay is up.
+- On multi-window / iPad setups the overlays attach to the foreground-active `UIWindowScene` and move to another one if their scene is disconnected or goes to the background.
 - **DI-friendly (e.g. DITranquility).** `OverlayServiceImpl.shared` conforms to `OverlayService` (and the narrower `ToastPresenting` / `LoadingPresenting`). Register the shared instance once and inject whichever protocol a screen needs:
 
 ```swift

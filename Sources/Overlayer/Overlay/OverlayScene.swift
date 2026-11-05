@@ -7,17 +7,31 @@
 
 import UIKit
 
-// Locates the scene Overlayer attaches its windows to, and lets a window manager wait for one if none is active yet (e.g. a show during launch).
+// Locates the scene Overlayer attaches its windows to and reports scene lifecycle events, so windows can be installed once a scene exists and moved off a scene that went away.
 @MainActor enum OverlayScene {
-    static var active: UIWindowScene? {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        return scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+    /// Best scene to show overlays in: foreground-active first, then foreground-inactive, then any attached one.
+    static var active: UIWindowScene? { active(excluding: nil) }
+
+    static func active(excluding excluded: UIScene?) -> UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .filter { $0 !== excluded && $0.activationState != .unattached }
+        return scenes.first { $0.activationState == .foregroundActive }
+            ?? scenes.first { $0.activationState == .foregroundInactive }
+            ?? scenes.first
     }
 
-    static func observeActivation(_ handler: @escaping (UIWindowScene) -> Void) -> NSObjectProtocol {
-        NotificationCenter.default.addObserver(forName: UIScene.didActivateNotification, object: nil, queue: .main) { note in
+    /// Whether a window attached to `scene` can currently be seen.
+    static func isUsable(_ scene: UIWindowScene?) -> Bool {
+        guard let scene else { return false }
+        return scene.activationState == .foregroundActive || scene.activationState == .foregroundInactive
+    }
+
+    static func observe(_ name: Notification.Name, _ handler: @escaping @MainActor @Sendable (UIWindowScene) -> Void) -> NSObjectProtocol {
+        NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { note in
             guard let scene = note.object as? UIWindowScene else { return }
-            Task { @MainActor in handler(scene) }
+            // Delivered on the main queue, so the main actor can be assumed rather than hopping through a Task.
+            MainActor.assumeIsolated { handler(scene) }
         }
     }
 }

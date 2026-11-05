@@ -75,4 +75,26 @@ import XCTest
         presenter.dismiss(id: toasts[0].id)
         XCTAssertEqual(presenter.visible.map(\.id), [toasts[2].id])
     }
+
+    func testVisibleChangesNotify() {
+        let presenter = makePresenter(maxVisible: 1)
+        var changes = 0
+        presenter.onChange = { changes += 1 }
+        let toasts = (0..<2).map { _ in makeToast(on: presenter) }
+        toasts.forEach { presenter.present($0) }
+        XCTAssertEqual(changes, 1, "a queued toast does not change the visible set")
+        presenter.dismiss(id: toasts[0].id)
+        XCTAssertEqual(changes, 3, "removal plus promotion of the queued toast")
+    }
+
+    func testDismissAllReportsSettled() {
+        let presenter = makePresenter(maxVisible: 2)
+        presenter.present(makeToast(on: presenter))
+        let settled = expectation(description: "settled after dismissAll")
+        presenter.onSettled = {
+            if presenter.visible.isEmpty { settled.fulfill() }
+        }
+        presenter.dismissAll()
+        wait(for: [settled], timeout: 2)
+    }
 }
