@@ -9,11 +9,11 @@ import SwiftUI
 import UIKit
 
 // Single manager for every overlay window: a passthrough window for toasts (above alerts) and a loading window (above the app and its sheets, below system alerts; blocking by default, pass-through when configured). Each window is created on first use, shown while it has content, and hidden once its dismissal animation has played out. Adding a new overlay kind means adding one slot here, not a parallel manager.
-@MainActor final class OverlayWindowManager {
+final class OverlayWindowManager {
     private let toastPresenter: ToastPresenter
     private let loadingPresenter: LoadingPresenter
     private let relay = PassthroughRelay()
-    private var sceneObservers: [NSObjectProtocol] = []
+    private var sceneObservers: [any NSObjectProtocol] = []
 
     private lazy var toastSlot = OverlayWindowSlot(
         makeWindow: { [unowned self] scene in makeToastWindow(in: scene) },

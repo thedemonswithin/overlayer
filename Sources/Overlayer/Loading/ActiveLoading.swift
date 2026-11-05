@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Internal record for one live loading presentation.
-@MainActor final class ActiveLoading: Identifiable {
+final class ActiveLoading: Identifiable {
     let id: LoadingID
     let model: any LoadingModel
     let configuration: LoadingConfiguration

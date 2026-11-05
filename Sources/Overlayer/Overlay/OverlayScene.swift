@@ -8,7 +8,7 @@
 import UIKit
 
 // Locates the scene Overlayer attaches its windows to and reports scene lifecycle events, so windows can be installed once a scene exists and moved off a scene that went away.
-@MainActor enum OverlayScene {
+enum OverlayScene {
     /// Best scene to show overlays in: foreground-active first, then foreground-inactive, then any attached one.
     static var active: UIWindowScene? { active(excluding: nil) }
 
@@ -27,7 +27,7 @@ import UIKit
         return scene.activationState == .foregroundActive || scene.activationState == .foregroundInactive
     }
 
-    static func observe(_ name: Notification.Name, _ handler: @escaping @MainActor @Sendable (UIWindowScene) -> Void) -> NSObjectProtocol {
+    static func observe(_ name: Notification.Name, _ handler: @escaping @MainActor @Sendable (UIWindowScene) -> Void) -> any NSObjectProtocol {
         NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { note in
             guard let scene = note.object as? UIWindowScene else { return }
             // Delivered on the main queue, so the main actor can be assumed rather than hopping through a Task.

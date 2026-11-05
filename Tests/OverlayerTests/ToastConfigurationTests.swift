@@ -5,30 +5,31 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import XCTest
-
+import Foundation
+import Testing
 @testable import Overlayer
 
-final class ToastConfigurationTests: XCTestCase {
-    func testToastDefaults() {
+// Configuration values are plain Sendable data, usable off the main actor.
+@Suite struct ToastConfigurationTests {
+    @Test nonisolated func toastDefaults() {
         let configuration = ToastConfiguration.default
-        XCTAssertEqual(configuration.position, .bottom)
-        XCTAssertEqual(configuration.lifetime, .seconds(4))
-        XCTAssertFalse(configuration.isSwipeToDismissEnabled)
-        XCTAssertFalse(configuration.isTapToPauseEnabled)
-        XCTAssertTrue(configuration.isHoldToPauseEnabled)
-        XCTAssertTrue(configuration.showsCloseButton)
-        XCTAssertTrue(configuration.showsProgressBar)
+        #expect(configuration.position == .bottom)
+        #expect(configuration.lifetime == .seconds(4))
+        #expect(!configuration.isSwipeToDismissEnabled)
+        #expect(!configuration.isTapToPauseEnabled)
+        #expect(configuration.isHoldToPauseEnabled)
+        #expect(configuration.showsCloseButton)
+        #expect(configuration.showsProgressBar)
     }
 
-    func testContainerDefaults() {
+    @Test nonisolated func containerDefaults() {
         let container = ToastContainerConfiguration.default
-        XCTAssertEqual(container.maxVisibleCount, 3)
-        XCTAssertEqual(container.spacing, 8)
+        #expect(container.maxVisibleCount == 3)
+        #expect(container.spacing == 8)
     }
 
-    func testLifetimeDuration() {
-        XCTAssertEqual(ToastLifetime.seconds(3).duration, 3)
-        XCTAssertNil(ToastLifetime.sticky.duration)
+    @Test(arguments: [(ToastLifetime.seconds(3), 3.0), (.sticky, nil)] as [(ToastLifetime, TimeInterval?)])
+    nonisolated func lifetimeDuration(lifetime: ToastLifetime, expected: TimeInterval?) {
+        #expect(lifetime.duration == expected)
     }
 }

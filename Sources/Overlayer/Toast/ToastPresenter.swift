@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 
-@MainActor final class ToastPresenter: ObservableObject {
+final class ToastPresenter: ObservableObject {
     @Published private(set) var visible: [ActiveToast] = [] {
         didSet { onChange?() }
     }
@@ -86,7 +86,7 @@ import SwiftUI
 
     private func startTickingIfNeeded() {
         guard tickTask == nil, visible.contains(where: { $0.totalLifetime != nil }) else { return }
-        tickTask = Task { @MainActor [weak self] in
+        tickTask = Task { [weak self] in
             var last = Date.now
             while true {
                 let interval = self?.tickInterval ?? 0.05

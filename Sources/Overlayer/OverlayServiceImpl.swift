@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Single implementation behind `OverlayService`. Holds the registries, presenters, and the shared window manager. Configure it through the `Overlayer` facade; inject it (as `OverlayService` or a narrower protocol) for runtime calls.
-@MainActor public final class OverlayServiceImpl: OverlayService {
+public final class OverlayServiceImpl: OverlayService {
     /// Shared singleton. `nonisolated` so it can be registered from a DI container's non-isolated factory closure; the instance is `Sendable` because it is fully main-actor isolated.
     public nonisolated static let shared = OverlayServiceImpl()
 

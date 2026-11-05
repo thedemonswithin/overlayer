@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 /// Owns the stack of active loading overlays. The most recent one is displayed and the blocker stays up while the stack is non-empty, which supports nested loading. Pure state, so it is unit-testable without any UI.
-@MainActor final class LoadingPresenter: ObservableObject {
+final class LoadingPresenter: ObservableObject {
     @Published private(set) var stack: [ActiveLoading] = [] {
         didSet { onChange?() }
     }

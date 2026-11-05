@@ -5,10 +5,10 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import SwiftUI
 
 /// Composition-root facade for Overlayer. Register your views and set global configuration here (once, at startup); inject `OverlayService` (or a narrower protocol) for runtime `show` / `showLoading` calls.
-@MainActor public enum Overlayer {
+public enum Overlayer {
     /// The shared service, ready to inject into a DI container or call directly.
     public static var service: any OverlayService { OverlayServiceImpl.shared }
 

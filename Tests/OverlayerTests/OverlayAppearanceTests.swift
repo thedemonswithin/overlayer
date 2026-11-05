@@ -5,12 +5,11 @@
 //  Created by Evgeny Blinov on 05.11.2026.
 //
 
+import Testing
 import UIKit
-import XCTest
-
 @testable import Overlayer
 
-@MainActor final class OverlayAppearanceTests: XCTestCase {
+@Suite struct OverlayAppearanceTests {
     private final class Container: UIViewController {
         var child: UIViewController?
         override var childForStatusBarStyle: UIViewController? { child }
@@ -20,31 +19,31 @@ import XCTest
         override var childForStatusBarStyle: UIViewController? { self }
     }
 
-    func testResolveFollowsChildDelegation() {
+    @Test func resolveFollowsChildDelegation() {
         let leaf = UIViewController()
         let middle = Container()
         middle.child = leaf
         let root = Container()
         root.child = middle
-        XCTAssertTrue(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === leaf)
+        #expect(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === leaf)
     }
 
-    func testResolveStopsWithoutDelegation() {
+    @Test func resolveStopsWithoutDelegation() {
         let root = UIViewController()
-        XCTAssertTrue(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === root)
+        #expect(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === root)
     }
 
-    func testResolveStopsOnSelfReference() {
+    @Test func resolveStopsOnSelfReference() {
         let root = SelfReferencing()
-        XCTAssertTrue(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === root)
+        #expect(OverlayAppearance.resolve(root, child: \.childForStatusBarStyle) === root)
     }
 
-    func testTopmostWithoutPresentationIsRoot() {
+    @Test func topmostWithoutPresentationIsRoot() {
         let root = UIViewController()
-        XCTAssertTrue(OverlayAppearance.topmost(from: root) === root)
+        #expect(OverlayAppearance.topmost(from: root) === root)
     }
 
-    func testNoWindowMeansNoAppController() {
-        XCTAssertNil(OverlayAppearance.appController(below: nil))
+    @Test func noWindowMeansNoAppController() {
+        #expect(OverlayAppearance.appController(below: nil) == nil)
     }
 }

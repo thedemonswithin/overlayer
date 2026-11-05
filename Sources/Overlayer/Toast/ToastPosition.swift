@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ToastPosition: Sendable, Equatable {
+nonisolated public enum ToastPosition: Sendable, Equatable {
     case top
     case bottom
     case center

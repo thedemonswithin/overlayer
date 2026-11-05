@@ -66,7 +66,7 @@ struct ToastHostView: View {
 
 private extension ToastHostView {
     struct ToastFramePreferenceKey: PreferenceKey {
-        static var defaultValue: [ToastID: CGRect] = [:]
+        static let defaultValue: [ToastID: CGRect] = [:]
 
         static func reduce(value: inout [ToastID: CGRect], nextValue: () -> [ToastID: CGRect]) {
             value.merge(nextValue()) { _, latest in latest }

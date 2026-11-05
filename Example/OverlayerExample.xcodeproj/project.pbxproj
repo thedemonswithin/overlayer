@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,9 +15,9 @@
 
 /* Begin PBXFileReference section */
 		51CDA078649714747520F799 /* CustomOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomOverlays.swift; sourceTree = "<group>"; };
-		66D75CA7B8FD635D26063348 /* Toasty */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Toasty; path = ..; sourceTree = SOURCE_ROOT; };
 		8C4ADF280D9D41DA0BFE15B7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A34672892EF2C9BF35A3DEF9 /* OverlayerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OverlayerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A34672892EF2C9BF35A3DEF9 /* OverlayerExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OverlayerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4AA006A34F0B5E8FF93E42B /* Overlayer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Overlayer; path = ..; sourceTree = SOURCE_ROOT; };
 		ECE6D132C1F5214AE7CB1B20 /* OverlayerExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayerExampleApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -53,7 +53,7 @@
 		82683FF951BDA1F21DC8BBA0 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				66D75CA7B8FD635D26063348 /* Toasty */,
+				E4AA006A34F0B5E8FF93E42B /* Overlayer */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -98,9 +98,10 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 4C0EC6822E0A2AD9D7988ED1 /* Build configuration list for PBXProject "OverlayerExample" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -112,6 +113,8 @@
 			packageReferences = (
 				81CDFF2B3C8AD456F823EA15 /* XCLocalSwiftPackageReference ".." */,
 			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4619F7EC6DE540B0CFFF64F6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -140,7 +143,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 76X8TP584F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -150,7 +152,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.thedemonswithin.overlayer.example;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -161,7 +167,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 76X8TP584F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -171,7 +176,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.thedemonswithin.overlayer.example;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;

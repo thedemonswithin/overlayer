@@ -5,10 +5,10 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import SwiftUI
 
 /// Parametric knobs for a loading overlay. By default it blocks interaction with the views beneath it; set `isBlocking = false` to let touches pass through (a purely visual overlay).
-public struct LoadingConfiguration {
+nonisolated public struct LoadingConfiguration: Sendable {
     public static let `default` = LoadingConfiguration()
 
     /// Whether the overlay blocks interaction with the views beneath it. `true` (default) captures every touch; `false` lets touches pass straight through to the app — the overlay becomes visual-only, so don't put interactive controls on a non-blocking loader.

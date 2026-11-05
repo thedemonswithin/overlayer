@@ -6,25 +6,22 @@
 //
 
 import SwiftUI
-import XCTest
-
+import Testing
 @testable import Overlayer
 
-@MainActor final class OverlayServiceTests: XCTestCase {
+@Suite struct OverlayServiceTests {
     private struct ProtoToast: ToastModel { let text: String }
     private struct ProtoLoading: LoadingModel {}
 
-    func testImplConformsToOverlayProtocols() {
+    @Test func implConformsToOverlayProtocols() {
         let impl = OverlayServiceImpl()
         let overlay: any OverlayService = impl
         let toasts: any ToastPresenting = impl
         let loading: any LoadingPresenting = impl
-        _ = overlay
-        _ = toasts
-        _ = loading
+        #expect(overlay === toasts && toasts === loading)
     }
 
-    func testRegistrationAndConfiguration() {
+    @Test func registrationAndConfiguration() {
         let impl = OverlayServiceImpl()
         impl.toastContainerConfiguration = ToastContainerConfiguration(maxVisibleCount: 5)
         impl.defaultToastConfiguration = ToastConfiguration(position: .top, lifetime: .sticky)
@@ -34,7 +31,13 @@ import XCTest
         impl.registerLoading(ProtoLoading.self) { _, context in
             Button("Cancel") { context.dismiss() }
         }
-        XCTAssertEqual(impl.toastContainerConfiguration.maxVisibleCount, 5)
-        XCTAssertEqual(impl.defaultToastConfiguration.position, .top)
+        #expect(impl.toastContainerConfiguration.maxVisibleCount == 5)
+        #expect(impl.defaultToastConfiguration.position == .top)
+    }
+
+    // The shared instance is reachable from a nonisolated context (e.g. a DI container factory).
+    @Test nonisolated func sharedIsAvailableNonisolated() {
+        let shared: OverlayServiceImpl = OverlayServiceImpl.shared
+        #expect(shared === OverlayServiceImpl.shared)
     }
 }

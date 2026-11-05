@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Per-toast configuration — properties specific to a single toast, passed to `show` (or taken from `Overlayer.defaultToastConfiguration`). Stack-wide layout lives in `ToastContainerConfiguration`.
-public struct ToastConfiguration {
+nonisolated public struct ToastConfiguration: Sendable {
     public static let `default` = ToastConfiguration()
 
     /// Edge this toast is anchored to. Toasts with different positions render in separate containers, so top and bottom toasts can be shown at the same time.

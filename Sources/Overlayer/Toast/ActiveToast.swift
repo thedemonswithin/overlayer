@@ -8,7 +8,7 @@
 import SwiftUI
 
 // One live presentation: the model, its resolved view, the context, and the lifetime bookkeeping the presenter advances on every tick.
-@MainActor final class ActiveToast: Identifiable {
+final class ActiveToast: Identifiable {
     let id: ToastID
     let model: any ToastModel
     let configuration: ToastConfiguration

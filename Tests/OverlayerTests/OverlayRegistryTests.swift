@@ -6,27 +6,26 @@
 //
 
 import SwiftUI
-import XCTest
-
+import Testing
 @testable import Overlayer
 
-@MainActor final class OverlayRegistryTests: XCTestCase {
+@Suite struct OverlayRegistryTests {
     private struct ToastA: ToastModel {}
     private struct ToastB: ToastModel {}
     private struct LoadingA: LoadingModel {}
 
-    func testResolvesRegisteredToastModel() {
+    @Test func resolvesRegisteredToastModel() {
         let registry = OverlayRegistry<ToastContext>()
         registry.register(ToastA.self) { _, _ in AnyView(EmptyView()) }
         let context = ToastContext(id: ToastID(), configuration: .default, presenter: ToastPresenter())
-        XCTAssertNotNil(registry.makeView(for: ToastA(), context: context))
-        XCTAssertNil(registry.makeView(for: ToastB(), context: context))
+        #expect(registry.makeView(for: ToastA(), context: context) != nil)
+        #expect(registry.makeView(for: ToastB(), context: context) == nil)
     }
 
-    func testResolvesRegisteredLoadingModel() {
+    @Test func resolvesRegisteredLoadingModel() {
         let registry = OverlayRegistry<LoadingContext>()
         registry.register(LoadingA.self) { _, _ in AnyView(EmptyView()) }
         let context = LoadingContext(id: LoadingID(), presenter: LoadingPresenter())
-        XCTAssertNotNil(registry.makeView(for: LoadingA(), context: context))
+        #expect(registry.makeView(for: LoadingA(), context: context) != nil)
     }
 }

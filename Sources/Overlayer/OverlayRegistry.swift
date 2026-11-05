@@ -8,7 +8,7 @@
 import SwiftUI
 
 // Generic type-keyed map from a concrete model type to a view builder. One class serves every overlay kind (toasts, loading, …); the Context type is what differs per kind.
-@MainActor final class OverlayRegistry<Context> {
+final class OverlayRegistry<Context> {
     private var builders: [ObjectIdentifier: (Any, Context) -> AnyView] = [:]
 
     func register<Model>(

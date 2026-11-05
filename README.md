@@ -11,7 +11,7 @@ Lightweight **toasts** and **loading** indicator **overlays** for SwiftUI / UIKi
 
 Highlights:
 
-- iOS 16+, zero third-party dependencies, pure Swift.
+- iOS 16+, Swift 6 (tools 6.4) with strict concurrency, zero third-party dependencies, pure Swift.
 - One service, two narrow protocols: inject `ToastPresenting`, `LoadingPresenting`, or the combined `OverlayService`.
 - Setup (view registration + global config) lives on the `Overlayer` facade; runtime (`show` / `dismiss`) on the injected service.
 - Toasts queue past a max visible count; per-toast `position` renders top / bottom / center in separate containers simultaneously.
@@ -149,7 +149,7 @@ dependencies: [
 
 ## Notes
 
-- All API is `@MainActor`; call it from the main actor (UI code already is).
+- Services, views and contexts are `@MainActor`; call them from the main actor (UI code already is). Configuration values and ids (`ToastConfiguration`, `ToastContainerConfiguration`, `LoadingConfiguration`, `ToastID`, `LoadingID`, …) are `nonisolated` and `Sendable`, so they can be built anywhere.
 - Window levels: loading sits just above the app and its sheets (below system alerts and the keyboard); toasts sit above everything, so a toast can appear over a loading overlay.
 - A non-blocking loading overlay passes every touch through (visual-only) — keep interactive controls (e.g. a Cancel button) for the default blocking mode.
 - A blocking loading overlay ends text editing when it appears, since the keyboard sits above it.

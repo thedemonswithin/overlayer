@@ -5,10 +5,10 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import SwiftUI
 
 /// Stack-wide configuration shared by every toast container (top / center / bottom). Set once via `Overlayer.toastContainerConfiguration`.
-public struct ToastContainerConfiguration {
+nonisolated public struct ToastContainerConfiguration: Sendable {
     public static let `default` = ToastContainerConfiguration()
 
     /// Maximum number of toasts visible at the same time across all positions; further toasts are queued.

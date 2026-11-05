@@ -5,11 +5,11 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import Combine
+public import Combine
 import SwiftUI
 
 /// Live handle handed to every toast view. It exposes imperative controls (`dismiss`, `pause`, `resume`) and observable state (`progress`, `isPaused`) so a custom view can render its own chrome, while the bundled `ToastCard` consumes the very same context.
-@MainActor public final class ToastContext: ObservableObject {
+public final class ToastContext: ObservableObject {
     /// Identifier of the presentation this context drives.
     public let id: ToastID
     /// Whether the default chrome should render a close button.

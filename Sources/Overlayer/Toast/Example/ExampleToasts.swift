@@ -5,7 +5,7 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import SwiftUI
 
 public struct SuccessToastModel: ToastModel {
     public var title: String?

@@ -8,7 +8,7 @@
 import Foundation
 
 /// Handle handed to every loading view, letting it dismiss its own overlay (e.g. from a cancel button).
-@MainActor public final class LoadingContext {
+public final class LoadingContext {
     public let id: LoadingID
     private weak var presenter: LoadingPresenter?
 

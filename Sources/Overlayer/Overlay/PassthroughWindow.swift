@@ -8,7 +8,7 @@
 import UIKit
 
 /// Relay shared between the SwiftUI host and its window: the host reports the on-screen frame of every toast card (in window coordinates) and the window consults it to decide which touches to capture. Mutated and read on the main thread only.
-final class PassthroughRelay: @unchecked Sendable {
+final class PassthroughRelay {
     var interactiveFrames: [ToastID: CGRect] = [:]
     
     func capturesTouch(at point: CGPoint) -> Bool {

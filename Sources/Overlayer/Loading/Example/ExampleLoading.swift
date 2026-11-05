@@ -5,7 +5,8 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import Combine
+public import SwiftUI
 
 public struct SpinnerLoadingModel: LoadingModel {
     public var message: String?

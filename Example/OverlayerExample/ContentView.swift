@@ -124,7 +124,7 @@ struct ContentView: View {
     }
 
     private func hideLoading(_ id: LoadingID, after seconds: Double) {
-        Task { @MainActor in
+        Task {
             try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
             overlay.hideLoading(id)
         }
@@ -133,7 +133,7 @@ struct ContentView: View {
     private func simulateUpload() {
         let progress = LoadingProgress(fraction: 0, message: "Uploading… 0%")
         let id = overlay.showLoading(ProgressLoadingModel(progress: progress))
-        Task { @MainActor in
+        Task {
             for step in 1...20 {
                 try? await Task.sleep(nanoseconds: 90_000_000)
                 progress.fraction = Double(step) / 20
@@ -146,7 +146,7 @@ struct ContentView: View {
 
     private func nestedLoading() {
         let first = overlay.showLoading(SpinnerLoadingModel(message: "Step 1…"))
-        Task { @MainActor in
+        Task {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             let second = overlay.showLoading(SpinnerLoadingModel(message: "Step 2…"))
             try? await Task.sleep(nanoseconds: 1_500_000_000)

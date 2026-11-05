@@ -35,12 +35,12 @@ final class OverlayHostingController<Content: View>: UIHostingController<Content
 }
 
 // Finds the app controller whose appearance preferences an overlay window should mirror.
-@MainActor enum OverlayAppearance {
+enum OverlayAppearance {
     /// The topmost presented controller of the app's own normal-level window in the overlay's scene (key window first).
     static func appController(below overlayWindow: UIWindow?) -> UIViewController? {
         guard let scene = overlayWindow?.windowScene else { return nil }
         // Only normal-level windows: other overlay libraries' windows are never consulted, which also rules out forwarding loops between overlays.
-        let appWindows = scene.windows.filter { !($0 is OverlayWindow) && !$0.isHidden && $0.windowLevel == .normal }
+        let appWindows = scene.windows.filter { !($0 is any OverlayWindow) && !$0.isHidden && $0.windowLevel == .normal }
         let appWindow = appWindows.first(where: \.isKeyWindow) ?? appWindows.first
         return appWindow?.rootViewController.map(topmost)
     }

@@ -5,9 +5,9 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import Foundation
+public import Foundation
 
-public enum ToastLifetime: Sendable, Equatable {
+nonisolated public enum ToastLifetime: Sendable, Equatable {
     /// Auto-dismiss after the given number of seconds.
     case seconds(TimeInterval)
     /// Never auto-dismiss; the toast lives until dismissed manually (close button, swipe, or `dismiss`).

@@ -5,10 +5,10 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import UIKit
+public import UIKit
 
 /// Haptic played when a toast becomes visible. Fully parametric so each configuration can opt into the feedback that fits its semantics.
-public enum ToastHapticFeedback: Sendable {
+nonisolated public enum ToastHapticFeedback: Sendable, Equatable {
     case none
     case selection
     case impact(UIImpactFeedbackGenerator.FeedbackStyle)

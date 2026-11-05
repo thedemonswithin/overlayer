@@ -8,7 +8,7 @@
 import UIKit
 
 // Lifecycle of one overlay window: created lazily on the best scene (or as soon as one activates, for a show during launch), and moved to another scene when its own one is disconnected or no longer in the foreground.
-@MainActor final class OverlayWindowSlot<Window: UIWindow> {
+final class OverlayWindowSlot<Window: UIWindow> {
     private let makeWindow: (UIWindowScene) -> Window
     private let onInstall: (Window) -> Void
     private(set) var window: Window?
