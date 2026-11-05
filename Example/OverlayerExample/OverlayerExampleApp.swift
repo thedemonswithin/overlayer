@@ -6,13 +6,14 @@
 //
 
 import Overlayer
+import OverlayerDefaults
 import SwiftUI
 
 @main
 struct OverlayerExampleApp: App {
     init() {
-        Overlayer.registerExampleToasts()
-        Overlayer.registerExampleLoading()
+        Overlayer.registerDefaultToasts()
+        Overlayer.registerDefaultLoading()
         Overlayer.registerToast(DownloadToastModel.self) { model, context in
             DownloadToastView(model: model, context: context)
         }

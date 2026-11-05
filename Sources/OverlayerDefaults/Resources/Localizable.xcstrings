@@ -1,0 +1,17 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Loading": {
+      "comment": "VoiceOver announcement of a loading overlay without its own message.",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Загрузка"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

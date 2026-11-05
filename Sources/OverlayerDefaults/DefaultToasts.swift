@@ -1,10 +1,11 @@
 //
-//  ExampleToasts.swift
-//  Overlayer
+//  DefaultToasts.swift
+//  OverlayerDefaults
 //
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
+public import Overlayer
 public import SwiftUI
 
 public struct SuccessToastModel: ToastModel {
@@ -73,7 +74,7 @@ public struct SuccessToastView: View {
     }
 
     public var body: some View {
-        ExampleToastBody(icon: "checkmark.circle.fill", tint: .green, title: model.title, message: model.message, context: context)
+        DefaultToastBody(icon: "checkmark.circle.fill", tint: .green, title: model.title, message: model.message, context: context)
     }
 }
 
@@ -87,7 +88,7 @@ public struct ErrorToastView: View {
     }
 
     public var body: some View {
-        ExampleToastBody(icon: "xmark.octagon.fill", tint: .red, title: model.title, message: model.message, context: context)
+        DefaultToastBody(icon: "xmark.octagon.fill", tint: .red, title: model.title, message: model.message, context: context)
     }
 }
 
@@ -101,7 +102,7 @@ public struct InfoToastView: View {
     }
 
     public var body: some View {
-        ExampleToastBody(icon: "info.circle.fill", tint: .blue, title: model.title, message: model.message, context: context)
+        DefaultToastBody(icon: "info.circle.fill", tint: .blue, title: model.title, message: model.message, context: context)
     }
 }
 
@@ -115,22 +116,25 @@ public struct WarningToastView: View {
     }
 
     public var body: some View {
-        ExampleToastBody(icon: "exclamationmark.triangle.fill", tint: .orange, title: model.title, message: model.message, context: context)
+        DefaultToastBody(icon: "exclamationmark.triangle.fill", tint: .orange, title: model.title, message: model.message, context: context)
     }
 }
 
 public extension Overlayer {
-    /// Register the example toast types (Success / Error / Info / Warning). Optional — register your own types instead or in addition.
-    static func registerExampleToasts() {
+    /// Register the default toast types (Success / Error / Info / Warning). Optional: register your own types instead or in addition.
+    static func registerDefaultToasts() {
         registerToast(SuccessToastModel.self) { SuccessToastView(model: $0, context: $1) }
         registerToast(ErrorToastModel.self) { ErrorToastView(model: $0, context: $1) }
         registerToast(InfoToastModel.self) { InfoToastView(model: $0, context: $1) }
         registerToast(WarningToastModel.self) { WarningToastView(model: $0, context: $1) }
     }
+
+    @available(*, deprecated, renamed: "registerDefaultToasts()")
+    static func registerExampleToasts() { registerDefaultToasts() }
 }
 
-// Shared body for the example toasts: icon, optional title, and message, wrapped in a tinted `ToastCard`.
-struct ExampleToastBody: View {
+// Shared body for the default toasts: icon, optional title, and message, wrapped in a tinted `ToastCard`.
+struct DefaultToastBody: View {
     let icon: String
     let tint: Color
     let title: String?

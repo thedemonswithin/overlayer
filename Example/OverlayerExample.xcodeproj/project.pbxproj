@@ -11,6 +11,7 @@
 		73E4A0A269F8C88B0FA4EF49 /* CustomOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CDA078649714747520F799 /* CustomOverlays.swift */; };
 		80E67541B97E7046BE484FD9 /* Overlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 431F6D9195E505458766C729 /* Overlayer */; };
 		C1034A716976A0AA27EB0D28 /* OverlayerExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE6D132C1F5214AE7CB1B20 /* OverlayerExampleApp.swift */; };
+		D2E880496C2D7F10C02DBB7D /* OverlayerDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = DD42A5077C806C3ADF418796 /* OverlayerDefaults */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				80E67541B97E7046BE484FD9 /* Overlayer in Frameworks */,
+				D2E880496C2D7F10C02DBB7D /* OverlayerDefaults in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +87,7 @@
 			name = OverlayerExample;
 			packageProductDependencies = (
 				431F6D9195E505458766C729 /* Overlayer */,
+				DD42A5077C806C3ADF418796 /* OverlayerDefaults */,
 			);
 			productName = OverlayerExample;
 			productReference = A34672892EF2C9BF35A3DEF9 /* OverlayerExample.app */;
@@ -338,6 +341,10 @@
 		431F6D9195E505458766C729 /* Overlayer */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Overlayer;
+		};
+		DD42A5077C806C3ADF418796 /* OverlayerDefaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OverlayerDefaults;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

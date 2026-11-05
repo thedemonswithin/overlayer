@@ -1,36 +1,50 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Close" : {
-      "comment" : "Accessibility label of the toast close button.",
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Закрыть" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "Close": {
+      "comment": "Accessibility label of the toast close button.",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть"
+          }
+        }
       }
     },
-    "Dismiss" : {
-      "comment" : "VoiceOver action that dismisses a toast.",
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Скрыть" } }
+    "Dismiss": {
+      "comment": "VoiceOver action that dismisses a toast.",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скрыть"
+          }
+        }
       }
     },
-    "Loading" : {
-      "comment" : "VoiceOver announcement of a loading overlay without its own message.",
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Загрузка" } }
+    "Pause": {
+      "comment": "VoiceOver action that pauses a toast's auto-dismiss countdown.",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приостановить"
+          }
+        }
       }
     },
-    "Pause" : {
-      "comment" : "VoiceOver action that pauses a toast's auto-dismiss countdown.",
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Приостановить" } }
-      }
-    },
-    "Resume" : {
-      "comment" : "VoiceOver action that resumes a paused toast's auto-dismiss countdown.",
-      "localizations" : {
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Продолжить" } }
+    "Resume": {
+      "comment": "VoiceOver action that resumes a paused toast's auto-dismiss countdown.",
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

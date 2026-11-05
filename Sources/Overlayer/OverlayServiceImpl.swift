@@ -5,6 +5,7 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
+import os
 import SwiftUI
 
 /// Single implementation behind `OverlayService`. Holds the registries, presenters, and the shared window manager. Configure it through the `Overlayer` facade; inject it (as `OverlayService` or a narrower protocol) for runtime calls.
@@ -45,7 +46,7 @@ public final class OverlayServiceImpl: OverlayService {
         let id = ToastID()
         let context = ToastContext(id: id, configuration: configuration, presenter: toastPresenter)
         guard let content = toastRegistry.makeView(for: model, context: context) else {
-            assertionFailure("Overlayer: no toast view registered for \(type(of: model)). Call Overlayer.registerToast(_:content:) before showing it.")
+            reportUnregistered(model, kind: "toast", register: "Overlayer.registerToast(_:content:)")
             return id
         }
         windowManager.activateToasts()
@@ -66,7 +67,7 @@ public final class OverlayServiceImpl: OverlayService {
         let id = LoadingID()
         let context = LoadingContext(id: id, presenter: loadingPresenter)
         guard let content = loadingRegistry.makeView(for: model, context: context) else {
-            assertionFailure("Overlayer: no loading view registered for \(type(of: model)). Call Overlayer.registerLoading(_:content:) before showing it.")
+            reportUnregistered(model, kind: "loading", register: "Overlayer.registerLoading(_:content:)")
             return id
         }
         loadingPresenter.present(ActiveLoading(id: id, model: model, configuration: configuration, context: context, content: content))
@@ -81,4 +82,13 @@ public final class OverlayServiceImpl: OverlayService {
     public func hideAllLoading() {
         loadingPresenter.hideAll()
     }
+
+    // Nothing is shown for a model without a registered view (the returned id is inert). Release builds log it, debug builds also stop at an assertion so the missing registration is caught early.
+    private func reportUnregistered(_ model: Any, kind: String, register: String) {
+        let message = "No \(kind) view registered for \(String(reflecting: type(of: model))). Views are looked up by the model's exact type; call \(register) before showing it."
+        Self.logger.error("\(message, privacy: .public)")
+        assertionFailure("Overlayer: \(message)")
+    }
+
+    private static let logger = Logger(subsystem: "Overlayer", category: "registry")
 }

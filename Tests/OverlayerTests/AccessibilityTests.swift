@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import Testing
 @testable import Overlayer
+@testable import OverlayerDefaults
 
 @Suite struct AccessibilityTests {
     private struct Announced: ToastModel {
@@ -47,13 +48,21 @@ import Testing
 
     @Test func exampleLoadersFallBackToLocalizedLoading() {
         #expect(SpinnerLoadingModel(message: "Syncing…").accessibilityAnnouncement == "Syncing…")
-        #expect(SpinnerLoadingModel().accessibilityAnnouncement == OverlayAccessibility.localized("Loading"))
+        #expect(SpinnerLoadingModel().accessibilityAnnouncement == String(localized: "Loading", bundle: DefaultsResources.bundle))
     }
 
-    @Test(arguments: [("Close", "Закрыть"), ("Dismiss", "Скрыть"), ("Pause", "Приостановить"), ("Resume", "Продолжить"), ("Loading", "Загрузка")])
-    func russianTranslationsShip(key: String, expected: String) throws {
-        let path = try #require(Bundle.module.path(forResource: "ru", ofType: "lproj"), "ru.lproj is missing from the package bundle")
+    @Test(arguments: [("Close", "Закрыть"), ("Dismiss", "Скрыть"), ("Pause", "Приостановить"), ("Resume", "Продолжить")])
+    func coreRussianTranslationsShip(key: String, expected: String) throws {
+        #expect(try russianString(key, in: OverlayAccessibility.resources) == expected)
+    }
+
+    @Test func defaultsRussianTranslationsShip() throws {
+        #expect(try russianString("Loading", in: DefaultsResources.bundle) == "Загрузка")
+    }
+
+    private func russianString(_ key: String, in bundle: Bundle) throws -> String {
+        let path = try #require(bundle.path(forResource: "ru", ofType: "lproj"), "ru.lproj is missing from \(bundle.bundleURL.lastPathComponent)")
         let russian = try #require(Bundle(path: path))
-        #expect(russian.localizedString(forKey: key, value: nil, table: nil) == expected)
+        return russian.localizedString(forKey: key, value: nil, table: nil)
     }
 }

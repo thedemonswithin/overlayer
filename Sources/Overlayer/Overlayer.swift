@@ -31,6 +31,8 @@ public enum Overlayer {
     }
 
     /// Bind a toast model type to the SwiftUI view that renders it. View and model stay decoupled: add or remove types freely without touching any enum.
+    ///
+    /// Lookup uses the model's exact type: register each concrete type you show (a subclass or another conforming type does not inherit a registration). Registering a type again replaces its view.
     public static func registerToast<Model: ToastModel, Content: View>(
         _ type: Model.Type,
         @ViewBuilder content: @escaping (Model, ToastContext) -> Content
@@ -39,6 +41,8 @@ public enum Overlayer {
     }
 
     /// Bind a loading model type to the SwiftUI view that renders it.
+    ///
+    /// Like `registerToast(_:content:)`, lookup uses the model's exact type.
     public static func registerLoading<Model: LoadingModel, Content: View>(
         _ type: Model.Type,
         @ViewBuilder content: @escaping (Model, LoadingContext) -> Content

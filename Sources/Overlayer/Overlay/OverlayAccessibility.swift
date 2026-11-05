@@ -8,8 +8,11 @@
 import Foundation
 import UIKit
 
-// VoiceOver plumbing shared by toasts and loading, plus the package's localized strings.
+// VoiceOver plumbing shared by toasts and loading.
 enum OverlayAccessibility {
+    /// Bundle holding the package's localized strings.
+    static var resources: Bundle { .module }
+
     /// Speaks `text` without moving VoiceOver focus, which suits transient overlays like toasts.
     static func announce(_ text: String?) {
         guard let text, !text.isEmpty else { return }
@@ -19,9 +22,5 @@ enum OverlayAccessibility {
     /// Tells VoiceOver the screen changed so it re-reads the frontmost content (a blocking loader appeared or went away).
     static func screenChanged() {
         UIAccessibility.post(notification: .screenChanged, argument: nil)
-    }
-
-    static func localized(_ key: String.LocalizationValue) -> String {
-        String(localized: key, bundle: .module)
     }
 }

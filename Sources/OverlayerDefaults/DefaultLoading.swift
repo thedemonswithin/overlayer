@@ -1,18 +1,19 @@
 //
-//  ExampleLoading.swift
-//  Overlayer
+//  DefaultLoading.swift
+//  OverlayerDefaults
 //
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
 public import Combine
+public import Overlayer
 public import SwiftUI
 
 public struct SpinnerLoadingModel: LoadingModel {
     public var message: String?
 
     public var accessibilityAnnouncement: String? {
-        message ?? OverlayAccessibility.localized("Loading")
+        message ?? String(localized: "Loading", bundle: .module)
     }
 
     public init(message: String? = nil) {
@@ -55,7 +56,7 @@ public struct ProgressLoadingModel: LoadingModel {
     public var progress: LoadingProgress
 
     public var accessibilityAnnouncement: String? {
-        progress.message ?? OverlayAccessibility.localized("Loading")
+        progress.message ?? String(localized: "Loading", bundle: .module)
     }
 
     public init(progress: LoadingProgress) {
@@ -86,14 +87,17 @@ public struct ProgressLoadingView: View {
 }
 
 public extension Overlayer {
-    /// Register the example loading views: an indeterminate spinner and a determinate progress overlay.
-    static func registerExampleLoading() {
+    /// Register the default loading views: an indeterminate spinner and a determinate progress overlay.
+    static func registerDefaultLoading() {
         registerLoading(SpinnerLoadingModel.self) { SpinnerLoadingView(model: $0, context: $1) }
         registerLoading(ProgressLoadingModel.self) { ProgressLoadingView(model: $0, context: $1) }
     }
+
+    @available(*, deprecated, renamed: "registerDefaultLoading()")
+    static func registerExampleLoading() { registerDefaultLoading() }
 }
 
-// Shared centred card chrome for the example loading views.
+// Shared centred card chrome for the default loading views.
 private struct LoadingCard<Content: View>: View {
     @ViewBuilder var content: Content
 

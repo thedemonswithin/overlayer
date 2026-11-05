@@ -20,19 +20,21 @@ Highlights:
 - Built-in **close button** and bottom **progress bar** chrome, or render your own from the `ToastContext` (read `context.progress` inside a `TimelineView(.animation(paused: context.isPaused))` to animate it).
 - Lifetimes run on a monotonic clock with one sleeping task per toast — nothing ticks, and a paused toast costs nothing.
 - Register a model + view **independently** for any type — no enums, no switch — via one generic registry.
+- Ready-made Success / Error / Info / Warning toasts and spinner / progress loaders live in the optional `OverlayerDefaults` product.
 
 ## Quick start
 
-Register the view types you use once (e.g. in your `App` init). The overlay windows are created lazily on first use, so there is nothing else to wire up.
+Register the view types you use once (e.g. in your `App` init). The ready-made views come from the optional `OverlayerDefaults` product; skip it if you register only your own. The overlay windows are created lazily on first use, so there is nothing else to wire up.
 
 ```swift
 import Overlayer
+import OverlayerDefaults
 
 @main
 struct DemoApp: App {
     init() {
-        Overlayer.registerExampleToasts()    // Success / Error / Info / Warning
-        Overlayer.registerExampleLoading()    // spinner + determinate progress
+        Overlayer.registerDefaultToasts()     // Success / Error / Info / Warning
+        Overlayer.registerDefaultLoading()    // spinner + determinate progress
     }
     
     var body: some Scene {
@@ -158,11 +160,11 @@ Swift Package Manager — add the dependency in `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "1.0.0")
+    .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "2.0.0")
 ]
 ```
 
-…and list `Overlayer` among your target's dependencies. In Xcode: **File ▸ Add Package Dependencies…** and paste `https://github.com/thedemonswithin/overlayer.git`. 
+…and list `Overlayer` (plus `OverlayerDefaults` if you want the ready-made views) among your target's dependencies. Building the package requires Xcode with Swift 6.4; apps may target iOS 16+. Upgrading from 1.x: see [CHANGELOG.md](CHANGELOG.md). In Xcode: **File ▸ Add Package Dependencies…** and paste `https://github.com/thedemonswithin/overlayer.git`. 
 
 ## Notes
 
