@@ -27,6 +27,6 @@ struct LoadingHostView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .animation(presenter.top?.configuration.animation, value: presenter.stack.count)
+        // No `.animation(_:value:)` here: LoadingPresenter wraps every stack change in `withAnimation` with the right overlay's animation. A value-based animation keyed on the top overlay would be `nil` once the last one is removed, and `.animation(nil)` disables the fade-out.
     }
 }
