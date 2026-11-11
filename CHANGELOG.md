@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.1
 
 ### Added
 
@@ -12,11 +12,12 @@
 
 ### Fixed
 
+- The first toast and loader animate in instead of appearing at once.
 - `.seconds(.infinity)` and very long lifetimes no longer crash; they behave like `.sticky`. Zero or negative lifetimes hide at once and log a warning.
 - The last loader fades out instead of disappearing.
 - A cancelled drag no longer leaves a toast paused forever; the swipe gesture is attached only when swipe-to-dismiss is on.
 - `maxVisibleCount` below 1 is raised to 1 instead of queueing every toast.
-- Overlay windows hide only after the latest animation, and the first toast and loader animate in.
+- Overlay windows hide only after the latest animation.
 
 ## 2.0.0
 
