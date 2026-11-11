@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import UIKit
 
 final class ToastPresenter: ObservableObject {
     @Published private(set) var visible: [ActiveToast] = [] {
@@ -27,6 +28,8 @@ final class ToastPresenter: ObservableObject {
     private var changeCount = 0
     /// Speaks a toast's announcement for VoiceOver; replaceable in tests.
     var announce: @MainActor (String?) -> Void = OverlayAccessibility.announce
+    /// Whether VoiceOver is running; replaceable in tests.
+    var isVoiceOverRunning: @MainActor () -> Bool = { UIAccessibility.isVoiceOverRunning }
 
     private var queue: [ActiveToast] = []
     /// One sleeping task per running auto-dismiss toast; nothing ticks.
@@ -82,6 +85,7 @@ final class ToastPresenter: ObservableObject {
         }
         toast.configuration.haptic.trigger()
         announce(toast.model.accessibilityAnnouncement)
+        extendLifetimeForVoiceOver(toast)
         startLifetime(of: toast)
     }
 
@@ -99,6 +103,19 @@ final class ToastPresenter: ObservableObject {
         performAnimation(containerConfiguration.animation, body) { [weak self] in
             guard let self, change == self.changeCount else { return }
             self.onSettled?()
+        }
+    }
+
+    // Under VoiceOver a short countdown would hide the toast before the user can reach it, so it is stretched to the configured minimum (only before the countdown starts).
+    private func extendLifetimeForVoiceOver(_ toast: ActiveToast) {
+        let context = toast.context
+        guard isVoiceOverRunning(),
+              let total = context.timer.total,
+              !context.timer.isRunning, context.timer.accumulated == 0
+        else { return }
+        let minimum = ToastLifetime.seconds(toast.configuration.voiceOverMinimumLifetime).duration ?? total
+        if total < minimum {
+            context.timer = ToastTimer(total: minimum)
         }
     }
 

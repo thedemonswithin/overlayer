@@ -65,4 +65,19 @@ import Testing
         let russian = try #require(Bundle(path: path))
         return russian.localizedString(forKey: key, value: nil, table: nil)
     }
+
+    @Test(arguments: [
+        (ToastLifetime.seconds(4), true, 10.0),
+        (.seconds(4), false, 4.0),
+        (.seconds(30), true, 30.0),
+        (.sticky, true, nil)
+    ] as [(ToastLifetime, Bool, TimeInterval?)])
+    func voiceOverExtendsShortLifetimes(lifetime: ToastLifetime, voiceOver: Bool, expected: TimeInterval?) {
+        let presenter = makeToastPresenter(maxVisible: 1)
+        presenter.isVoiceOverRunning = { voiceOver }
+        let toast = makeToast(on: presenter, lifetime: lifetime)
+        presenter.present(toast)
+        #expect(toast.context.timer.total == expected)
+        presenter.dismiss(id: toast.id)
+    }
 }

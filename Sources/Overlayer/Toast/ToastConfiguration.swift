@@ -5,7 +5,7 @@
 //  Created by Evgeny Blinov on 10.06.2026.
 //
 
-import SwiftUI
+public import Foundation
 
 /// Per-toast configuration — properties specific to a single toast, passed to `show` (or taken from `Overlayer.defaultToastConfiguration`). Stack-wide layout lives in `ToastContainerConfiguration`.
 nonisolated public struct ToastConfiguration: Sendable {
@@ -27,6 +27,8 @@ nonisolated public struct ToastConfiguration: Sendable {
     public var showsCloseButton: Bool
     /// Whether the bundled `ToastCard` chrome shows the bottom progress bar.
     public var showsProgressBar: Bool
+    /// Shortest countdown while VoiceOver is running, in seconds. A VoiceOver user needs time to reach the toast before it hides, so a shorter lifetime is extended to this value; sticky and longer lifetimes are unchanged.
+    public var voiceOverMinimumLifetime: TimeInterval
 
     public init(
         position: ToastPosition = .bottom,
@@ -36,7 +38,8 @@ nonisolated public struct ToastConfiguration: Sendable {
         isTapToPauseEnabled: Bool = false,
         isHoldToPauseEnabled: Bool = true,
         showsCloseButton: Bool = true,
-        showsProgressBar: Bool = true
+        showsProgressBar: Bool = true,
+        voiceOverMinimumLifetime: TimeInterval = 10
     ) {
         self.position = position
         self.lifetime = lifetime
@@ -46,5 +49,6 @@ nonisolated public struct ToastConfiguration: Sendable {
         self.isHoldToPauseEnabled = isHoldToPauseEnabled
         self.showsCloseButton = showsCloseButton
         self.showsProgressBar = showsProgressBar
+        self.voiceOverMinimumLifetime = voiceOverMinimumLifetime
     }
 }
