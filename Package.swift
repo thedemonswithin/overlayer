@@ -1,4 +1,4 @@
-// swift-tools-version: 6.4
+// swift-tools-version: 6.2
 import PackageDescription
 
 // Swift 6 language mode with approachable concurrency: everything is main-actor isolated unless marked `nonisolated`, which fits a UI-only library.

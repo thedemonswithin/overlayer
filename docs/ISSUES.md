@@ -15,7 +15,7 @@ Code review of 2.0.0 (`b208574`). Each task lists the problem and the fix; the r
 | 9 | [VoiceOver: toast disappears before it can be reached](#9-voiceover-toast-disappears-before-it-can-be-reached) | accessibility | Lifetime fixed; check the actions with VoiceOver on a device |
 | 10 | [Tests and CI](#10-tests-and-ci) | infrastructure | Timing tests and CI done; window and gesture tests open |
 | 11 | [Document blocking loader limitations](#11-document-blocking-loader-limitations) | documentation | Documented in README |
-| 12 | [Minor cleanups](#12-minor-cleanups) | chore | `.gitignore` and doc comments done; model unification and older-toolchain manifest open |
+| 12 | [Minor cleanups](#12-minor-cleanups) | chore | `.gitignore`, doc comments and toolchain support (tools 6.2) done; model unification open |
 
 ## 1. Crash on infinite or huge toast lifetime
 
@@ -191,12 +191,12 @@ Describe both cases in the README.
 
 ## 12. Minor cleanups
 
-*chore* · **Status:** `.gitignore` and doc comments done; model unification and older-toolchain manifest open
+*chore* · **Status:** `.gitignore`, doc comments and toolchain support (tools 6.2) done; model unification open
 
 - `.serena/` isn't in `.gitignore`.
 - Public `ToastCard`, `ToastCloseButton`, `ToastPosition`, `ToastLifetime` have no doc comments.
 - The four bundled toast models and four views are identical apart from icon and color; they could become one model with a style.
-- `swift-tools-version: 6.4` excludes everyone on Xcode older than 27. Decide whether to add a manifest for earlier toolchains (`Package@swift-6.0.swift`).
+- ~~`swift-tools-version: 6.4` excludes everyone on Xcode older than 27.~~ Lowered to 6.2, the minimum for `defaultIsolation`; going lower would need a separate manifest without MainActor default isolation.
 
 ## Roadmap
 
@@ -207,5 +207,5 @@ Describe both cases in the README.
 5. **SwiftUI interface (2.2):** a `.toast(item:)` modifier and the service in `Environment` as an alternative to the global `Overlayer.service`.
 6. **Multi-window (3.0):** overlays per scene and scene selection in the API (task 6); check Mac Catalyst and visionOS.
 7. **Accessibility:** task 9; pause the lifetime while the app is in the background (toasts currently expire there too).
-8. **Infrastructure:** CI (task 10), DocC documentation, snapshot or UI tests for animations and gestures, support for toolchains older than 6.4.
+8. **Infrastructure:** CI (task 10), DocC documentation, snapshot or UI tests for animations and gestures, support for toolchains older than 6.2.
 

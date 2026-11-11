@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The package builds with Swift 6.2 (Xcode 26) and newer; it no longer requires Swift 6.4.
+
 ## 2.0.1
 
 ### Added

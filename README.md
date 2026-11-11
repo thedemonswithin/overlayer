@@ -20,7 +20,7 @@ Swift Package Manager:
 .package(url: "https://github.com/thedemonswithin/overlayer.git", from: "2.0.0")
 ```
 
-Add `Overlayer` to your target, and `OverlayerDefaults` if you want the ready-made views. The package builds with Xcode and Swift 6.4. Coming from 1.x? See [CHANGELOG.md](CHANGELOG.md).
+Add `Overlayer` to your target, and `OverlayerDefaults` if you want the ready-made views. The package builds with Swift 6.2 or newer (Xcode 26+). Coming from 1.x? See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 

@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The package needs Swift 6.4 (Xcode 27 or newer).
+      # The package needs Swift 6.2 (Xcode 26 or newer).
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
