@@ -12,7 +12,9 @@ struct ToastItemView: View {
     @State private var dragOffset: CGSize = .zero
     @State private var isHolding = false
     @State private var isStuckPaused = false
-    @State private var isDragging = false
+    // Gesture state resets on its own when the drag ends or is cancelled (system gesture, interruption), so the toast cannot get stuck paused; `onEnded` alone is not called on cancellation.
+    @GestureState private var isDragging = false
+    @State private var isDismissing = false
     @State private var pressStarted: Date?
     private var position: ToastPosition { toast.configuration.position }
 
@@ -21,7 +23,12 @@ struct ToastItemView: View {
             .offset(x: dragOffset.width, y: dragOffset.height)
             .onTapGesture { handleTap() }
             .onLongPressGesture(minimumDuration: 0.2, maximumDistance: 20, pressing: { handlePressing($0) }, perform: {})
-            .gesture(swipeGesture)
+            // Attached only when swipe-to-dismiss is on, so a disabled swipe neither pauses the toast nor competes with the app's own gestures.
+            .gesture(swipeGesture, including: toast.configuration.isSwipeToDismissEnabled ? .all : .subviews)
+            .onChange(of: isDragging) { dragging in
+                if !dragging { springBackIfNeeded() }
+                syncPause()
+            }
             // Gestures are unreachable with VoiceOver, so the same controls are offered as accessibility actions; the escape gesture (two-finger scrub) dismisses.
             .accessibilityElement(children: .contain)
             .accessibilityAction(.escape) { toast.context.dismiss() }
@@ -36,24 +43,23 @@ struct ToastItemView: View {
 
     private var swipeGesture: some Gesture {
         DragGesture(minimumDistance: 10, coordinateSpace: .local)
+            .updating($isDragging) { _, dragging, _ in dragging = true }
             .onChanged { value in
-                isDragging = true
-                syncPause()
-                if toast.configuration.isSwipeToDismissEnabled {
-                    dragOffset = rubberBanded(value.translation)
-                }
+                dragOffset = rubberBanded(value.translation)
             }
             .onEnded { value in
-                isDragging = false
-                if toast.configuration.isSwipeToDismissEnabled, shouldDismiss(value) {
-                    toast.context.dismiss()
-                    return
-                }
-                withAnimation(.interactiveSpring(response: 0.35, dampingFraction: 0.72)) {
-                    dragOffset = .zero
-                }
-                syncPause()
+                guard shouldDismiss(value) else { return }
+                isDismissing = true
+                toast.context.dismiss()
             }
+    }
+
+    // Runs once the drag is over, whether it ended or was cancelled: unless the toast is on its way out, it returns to its place.
+    private func springBackIfNeeded() {
+        guard !isDismissing, dragOffset != .zero else { return }
+        withAnimation(.interactiveSpring(response: 0.35, dampingFraction: 0.72)) {
+            dragOffset = .zero
+        }
     }
 
     // A quick tap toggles a sticky pause; a hold is handled by the long-press gesture, so ignore taps that were actually long presses.
