@@ -73,8 +73,9 @@ public final class OverlayServiceImpl: OverlayService {
             reportUnregistered(model, kind: "loading", register: "Overlayer.registerLoading(_:content:)")
             return id
         }
-        loadingPresenter.present(ActiveLoading(id: id, model: model, configuration: configuration, context: context, content: content))
+        // Prepare the window first, so the overlay is inserted into an already rendered host and its appear animation plays.
         windowManager.showLoading()
+        loadingPresenter.present(ActiveLoading(id: id, model: model, configuration: configuration, context: context, content: content))
         return id
     }
 

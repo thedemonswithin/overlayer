@@ -9,7 +9,10 @@ import SwiftUI
 
 // Runs a state change inside `withAnimation` and reports when the animation has played out, so an overlay window can be hidden only after its content has finished animating away.
 enum OverlayAnimation {
-    /// iOS 16 has no animation completion, so the settle callback fires after this fixed delay instead. Long enough for the default eases and springs.
+    /// Signature of `perform`, so presenters can take a replacement in tests.
+    typealias Performer = @MainActor (_ animation: Animation?, _ body: () -> Void, _ settled: @escaping @MainActor () -> Void) -> Void
+
+    /// iOS 16 has no animation completion, so the settle callback fires after this fixed delay instead. Long enough for the default eases and springs; a custom animation longer than this is cut short on iOS 16 when the window hides.
     static let legacySettleDelay: TimeInterval = 0.8
 
     static func perform(_ animation: Animation?, _ body: () -> Void, settled: @escaping @MainActor () -> Void) {

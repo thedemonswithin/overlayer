@@ -163,4 +163,21 @@ import Testing
         presenter.present(toast)
         #expect(presenter.visible.map(\.id) == [toast.id])
     }
+
+    @Test func onlyTheLatestChangeReportsSettling() {
+        let presenter = makeToastPresenter(maxVisible: 3)
+        let animations = ManualAnimations()
+        presenter.performAnimation = animations.performer
+        var settled = 0
+        presenter.onSettled = { settled += 1 }
+        let toast = makeToast(on: presenter)
+        presenter.present(toast)
+        presenter.dismiss(id: toast.id)
+        presenter.present(makeToast(on: presenter))
+        animations.settle(0)
+        animations.settle(1)
+        #expect(settled == 0)
+        animations.settle(2)
+        #expect(settled == 1)
+    }
 }

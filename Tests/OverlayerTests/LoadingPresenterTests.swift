@@ -69,4 +69,21 @@ import Testing
         }
         #expect(presenter.stack.isEmpty)
     }
+
+    // Regression: with overlapping changes, an earlier animation settling used to hide the window while a later one was still running.
+    @Test func onlyTheLatestChangeReportsSettling() {
+        let presenter = LoadingPresenter()
+        let animations = ManualAnimations()
+        presenter.performAnimation = animations.performer
+        var settled = 0
+        presenter.onSettled = { settled += 1 }
+        let first = makeLoading(on: presenter)
+        presenter.present(first)
+        presenter.hide(id: first.id)
+        presenter.present(makeLoading(on: presenter))
+        animations.settle(1)
+        #expect(settled == 0, "the hide animation finished, but a newer show is still running")
+        animations.settle(2)
+        #expect(settled == 1)
+    }
 }

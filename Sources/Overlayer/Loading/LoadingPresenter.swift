@@ -18,6 +18,10 @@ final class LoadingPresenter: ObservableObject {
     var onChange: (() -> Void)?
     /// Called once the animation of a stack change has played out.
     var onSettled: (() -> Void)?
+    /// Runs a change inside an animation; replaceable in tests.
+    var performAnimation: OverlayAnimation.Performer = OverlayAnimation.perform
+
+    private var changeCount = 0
 
     func present(_ loading: ActiveLoading) {
         animate(loading.configuration.animation) {
@@ -39,7 +43,13 @@ final class LoadingPresenter: ObservableObject {
         }
     }
 
+    // Only the latest change reports settling: when changes overlap (hide, show, hide), an earlier animation finishing must not hide the window while a later one is still running.
     private func animate(_ animation: Animation, _ body: () -> Void) {
-        OverlayAnimation.perform(animation, body) { [weak self] in self?.onSettled?() }
+        changeCount += 1
+        let change = changeCount
+        performAnimation(animation, body) { [weak self] in
+            guard let self, change == self.changeCount else { return }
+            self.onSettled?()
+        }
     }
 }

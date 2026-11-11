@@ -41,3 +41,17 @@ func awaitCallback(_ install: (@escaping () -> Void) -> Void) async {
         }
     }
 }
+
+/// Animation performer that runs changes immediately and keeps their completions, so a test decides when (and in which order) each animation settles.
+final class ManualAnimations {
+    private(set) var pending: [@MainActor () -> Void] = []
+
+    var performer: OverlayAnimation.Performer {
+        { [unowned self] _, body, settled in
+            body()
+            pending.append(settled)
+        }
+    }
+
+    func settle(_ index: Int) { pending[index]() }
+}

@@ -116,6 +116,8 @@ final class OverlayWindowManager {
         host.view.backgroundColor = .clear
         window.rootViewController = host
         window.isHidden = true
+        // Render the empty state once, so the first toast is an animated insertion rather than the host's initial content.
+        host.view.layoutIfNeeded()
         return window
     }
 
@@ -128,6 +130,8 @@ final class OverlayWindowManager {
         host.view.backgroundColor = .clear
         window.rootViewController = host
         window.isHidden = true
+        // Render the empty state once, so the first loader fades in instead of appearing as the host's initial content.
+        host.view.layoutIfNeeded()
         return window
     }
 }

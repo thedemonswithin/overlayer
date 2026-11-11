@@ -21,6 +21,10 @@ final class ToastPresenter: ObservableObject {
     var onChange: (() -> Void)?
     /// Called once the animation of a visible-set change has played out.
     var onSettled: (() -> Void)?
+    /// Runs a change inside an animation; replaceable in tests.
+    var performAnimation: OverlayAnimation.Performer = OverlayAnimation.perform
+
+    private var changeCount = 0
     /// Speaks a toast's announcement for VoiceOver; replaceable in tests.
     var announce: @MainActor (String?) -> Void = OverlayAccessibility.announce
 
@@ -88,8 +92,14 @@ final class ToastPresenter: ObservableObject {
         }
     }
 
+    // Only the latest change reports settling, so an earlier animation finishing cannot hide the window under a later one.
     private func animate(_ body: () -> Void) {
-        OverlayAnimation.perform(containerConfiguration.animation, body) { [weak self] in self?.onSettled?() }
+        changeCount += 1
+        let change = changeCount
+        performAnimation(containerConfiguration.animation, body) { [weak self] in
+            guard let self, change == self.changeCount else { return }
+            self.onSettled?()
+        }
     }
 
     private func startLifetime(of toast: ActiveToast) {
