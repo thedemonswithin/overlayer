@@ -43,6 +43,9 @@ public final class OverlayServiceImpl: OverlayService {
 
     @discardableResult public func show<Model: ToastModel>(_ model: Model, configuration: ToastConfiguration?) -> ToastID {
         let configuration = configuration ?? defaultToastConfiguration
+        if configuration.lifetime.isNonPositive {
+            Self.logger.warning("Toast \(String(reflecting: Model.self), privacy: .public) has a non-positive lifetime and hides immediately.")
+        }
         let id = ToastID()
         let context = ToastContext(id: id, configuration: configuration, presenter: toastPresenter)
         guard let content = toastRegistry.makeView(for: model, context: context) else {

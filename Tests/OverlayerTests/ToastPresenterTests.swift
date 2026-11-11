@@ -133,4 +133,26 @@ import Testing
         #expect(context.isPaused)
         presenter.dismiss(id: id)
     }
+
+    // Regression: converting an infinite remaining time into a sleep duration used to trap.
+    @Test(arguments: [TimeInterval.infinity, .greatestFiniteMagnitude, .nan])
+    func unboundedLifetimeIsSticky(seconds: TimeInterval) {
+        let presenter = makeToastPresenter(maxVisible: 1)
+        let toast = makeToast(on: presenter, lifetime: .seconds(seconds))
+        presenter.present(toast)
+        #expect(presenter.visible.map(\.id) == [toast.id])
+        #expect(!toast.context.isProgressive)
+        #expect(toast.context.progress == 1)
+        presenter.dismiss(id: toast.id)
+    }
+
+    @Test(.timeLimit(.minutes(1))) func negativeLifetimeHidesImmediately() async {
+        let presenter = makeToastPresenter(maxVisible: 1)
+        let toast = makeToast(on: presenter, lifetime: .seconds(-1))
+        await awaitCallback { done in
+            presenter.onChange = { if presenter.visible.isEmpty { done() } }
+            presenter.present(toast)
+        }
+        #expect(presenter.visible.isEmpty)
+    }
 }
