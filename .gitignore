@@ -10,3 +10,5 @@ Icon
 DerivedData/
 build/
 xcuserdata/
+# Tool state
+.serena/

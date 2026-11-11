@@ -2,24 +2,24 @@
 
 Code review of 2.0.0 (`b208574`). Each task lists the problem and the fix; the roadmap is at the end.
 
-| # | Task | Labels |
-|---|---|---|
-| 1 | [Crash on infinite or huge toast lifetime](#1-crash-on-infinite-or-huge-toast-lifetime) | bug, priority: high |
-| 2 | [Last loader disappears without animation](#2-last-loader-disappears-without-animation) | bug, priority: high |
-| 3 | [Toast can stay paused forever after a cancelled drag](#3-toast-can-stay-paused-forever-after-a-cancelled-drag) | bug, priority: high |
-| 4 | [maxVisibleCount ≤ 0 silently hides all toasts](#4-maxvisiblecount--0-silently-hides-all-toasts) | bug |
-| 5 | [Bundled models and LoadingProgress can't be used off the main actor](#5-bundled-models-and-loadingprogress-cant-be-used-off-the-main-actor) | bug, api |
-| 6 | [iPad multi-window: overlay appears in an arbitrary scene](#6-ipad-multi-window-overlay-appears-in-an-arbitrary-scene) | bug, enhancement |
-| 7 | [Toasts stretch to the full screen width](#7-toasts-stretch-to-the-full-screen-width) | enhancement |
-| 8 | [Overlay window can hide too early; first show has no appear animation](#8-overlay-window-can-hide-too-early-first-show-has-no-appear-animation) | bug |
-| 9 | [VoiceOver: toast disappears before it can be reached](#9-voiceover-toast-disappears-before-it-can-be-reached) | accessibility |
-| 10 | [Tests and CI](#10-tests-and-ci) | infrastructure |
-| 11 | [Document blocking loader limitations](#11-document-blocking-loader-limitations) | documentation |
-| 12 | [Minor cleanups](#12-minor-cleanups) | chore |
+| # | Task | Labels | Status |
+|---|---|---|---|
+| 1 | [Crash on infinite or huge toast lifetime](#1-crash-on-infinite-or-huge-toast-lifetime) | bug, priority: high | Fixed |
+| 2 | [Last loader disappears without animation](#2-last-loader-disappears-without-animation) | bug, priority: high | Fixed; check the fade-out on a device |
+| 3 | [Toast can stay paused forever after a cancelled drag](#3-toast-can-stay-paused-forever-after-a-cancelled-drag) | bug, priority: high | Fixed; check gestures on a device |
+| 4 | [maxVisibleCount ≤ 0 silently hides all toasts](#4-maxvisiblecount--0-silently-hides-all-toasts) | bug | Fixed |
+| 5 | [Bundled models and LoadingProgress can't be used off the main actor](#5-bundled-models-and-loadingprogress-cant-be-used-off-the-main-actor) | bug, api | Fixed |
+| 6 | [iPad multi-window: overlay appears in an arbitrary scene](#6-ipad-multi-window-overlay-appears-in-an-arbitrary-scene) | bug, enhancement | Documented in README; per-scene overlays are on the roadmap |
+| 7 | [Toasts stretch to the full screen width](#7-toasts-stretch-to-the-full-screen-width) | enhancement | Fixed |
+| 8 | [Overlay window can hide too early; first show has no appear animation](#8-overlay-window-can-hide-too-early-first-show-has-no-appear-animation) | bug | Fixed; iOS 16 delay documented |
+| 9 | [VoiceOver: toast disappears before it can be reached](#9-voiceover-toast-disappears-before-it-can-be-reached) | accessibility | Lifetime fixed; check the actions with VoiceOver on a device |
+| 10 | [Tests and CI](#10-tests-and-ci) | infrastructure | Timing tests and CI done; window and gesture tests open |
+| 11 | [Document blocking loader limitations](#11-document-blocking-loader-limitations) | documentation | Documented in README |
+| 12 | [Minor cleanups](#12-minor-cleanups) | chore | `.gitignore` and doc comments done; model unification and older-toolchain manifest open |
 
 ## 1. Crash on infinite or huge toast lifetime
 
-*bug, priority: high*
+*bug, priority: high* · **Status:** Fixed
 
 ### Problem
 
@@ -34,7 +34,7 @@ Negative values and NaN don't crash, but the toast disappears instantly with no 
 
 ## 2. Last loader disappears without animation
 
-*bug, priority: high*
+*bug, priority: high* · **Status:** Fixed; check the fade-out on a device
 
 ### Problem
 
@@ -51,7 +51,7 @@ Found by reading the code; not yet confirmed on a device.
 
 ## 3. Toast can stay paused forever after a cancelled drag
 
-*bug, priority: high*
+*bug, priority: high* · **Status:** Fixed; check gestures on a device
 
 ### Problem
 
@@ -68,7 +68,7 @@ Found by reading the code; not reproduced yet.
 
 ## 4. maxVisibleCount ≤ 0 silently hides all toasts
 
-*bug*
+*bug* · **Status:** Fixed
 
 ### Problem
 
@@ -81,7 +81,7 @@ With `maxVisibleCount` of 0 or less, the check `visible.count < maxVisibleCount`
 
 ## 5. Bundled models and LoadingProgress can't be used off the main actor
 
-*bug, api*
+*bug, api* · **Status:** Fixed
 
 ### Problem
 
@@ -101,7 +101,7 @@ Configurations and ids are already `nonisolated`, so data types behave inconsist
 
 ## 6. iPad multi-window: overlay appears in an arbitrary scene
 
-*bug, enhancement*
+*bug, enhancement* · **Status:** Documented in README; per-scene overlays are on the roadmap
 
 ### Problem
 
@@ -118,7 +118,7 @@ The window is placed in the first `foregroundActive` scene ([`OverlayScene`](htt
 
 ## 7. Toasts stretch to the full screen width
 
-*enhancement*
+*enhancement* · **Status:** Fixed
 
 ### Problem
 
@@ -130,7 +130,7 @@ Add `maxWidth` to `ToastContainerConfiguration` with a sensible default (around 
 
 ## 8. Overlay window can hide too early; first show has no appear animation
 
-*bug*
+*bug* · **Status:** Fixed; iOS 16 delay documented
 
 ### Problem
 
@@ -146,7 +146,7 @@ Add `maxWidth` to `ToastContainerConfiguration` with a sensible default (around 
 
 ## 9. VoiceOver: toast disappears before it can be reached
 
-*accessibility*
+*accessibility* · **Status:** Lifetime fixed; check the actions with VoiceOver on a device
 
 ### Problem
 
@@ -160,7 +160,7 @@ Add `maxWidth` to `ToastContainerConfiguration` with a sensible default (around 
 
 ## 10. Tests and CI
 
-*infrastructure*
+*infrastructure* · **Status:** Timing tests and CI done; window and gesture tests open
 
 ### Problem
 
@@ -176,7 +176,7 @@ Add `maxWidth` to `ToastContainerConfiguration` with a sensible default (around 
 
 ## 11. Document blocking loader limitations
 
-*documentation*
+*documentation* · **Status:** Documented in README
 
 ### Problem
 
@@ -191,7 +191,7 @@ Describe both cases in the README.
 
 ## 12. Minor cleanups
 
-*chore*
+*chore* · **Status:** `.gitignore` and doc comments done; model unification and older-toolchain manifest open
 
 - `.serena/` isn't in `.gitignore`.
 - Public `ToastCard`, `ToastCloseButton`, `ToastPosition`, `ToastLifetime` have no doc comments.

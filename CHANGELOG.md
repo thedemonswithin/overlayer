@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `ToastContainerConfiguration.maxWidth` (500 pt by default) keeps toasts from spanning wide screens.
+- `ToastConfiguration.voiceOverMinimumLifetime`: while VoiceOver is running, short toasts stay at least 10 s.
+- `LoadingProgress.report(fraction:message:)` updates progress from any thread.
+- `ToastModel` and `LoadingModel` are `nonisolated`; the ready-made models are `nonisolated` and `Sendable`.
+- CI workflow on GitHub Actions.
+
+### Fixed
+
+- `.seconds(.infinity)` and very long lifetimes no longer crash; they behave like `.sticky`. Zero or negative lifetimes hide at once and log a warning.
+- The last loader fades out instead of disappearing.
+- A cancelled drag no longer leaves a toast paused forever; the swipe gesture is attached only when swipe-to-dismiss is on.
+- `maxVisibleCount` below 1 is raised to 1 instead of queueing every toast.
+- Overlay windows hide only after the latest animation, and the first toast and loader animate in.
+
 ## 2.0.0
 
 ### Breaking

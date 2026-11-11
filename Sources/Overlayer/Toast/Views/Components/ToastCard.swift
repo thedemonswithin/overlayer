@@ -7,6 +7,7 @@
 
 public import SwiftUI
 
+/// Standard toast chrome around your content: a rounded card with a close button and a bottom progress bar, both shown according to the toast's configuration.
 public struct ToastCard<Content: View>: View {
     private let context: ToastContext
     private let accent: Color

@@ -7,6 +7,7 @@
 
 public import SwiftUI
 
+/// Small circular button that dismisses its toast; use it in custom toast views that don't wrap their content in `ToastCard`.
 public struct ToastCloseButton: View {
     private let context: ToastContext
     

@@ -60,7 +60,7 @@ Overlayer.service.show(
 ```
 
 - Top, center and bottom toasts can be on screen at the same time; extra toasts wait in a queue.
-- A toast hides itself after its lifetime, or stays until closed with `.sticky`.
+- A toast hides itself after its lifetime, or stays until closed with `.sticky` (an infinite `.seconds` value works the same).
 - Users can close a toast with its button or a swipe, and pause it with a hold or a tap (swipe and tap are opt-in).
 - `Overlayer.service.dismiss(id)` and `dismissAll()` close toasts from code.
 
@@ -94,7 +94,8 @@ Loading overlays stack, so nested loads work: the newest one is shown, and the s
 // Determinate progress you update as the work goes
 let progress = LoadingProgress(message: "Uploading…")
 let id = Overlayer.service.showLoading(ProgressLoadingModel(progress: progress))
-progress.fraction = 0.4
+progress.fraction = 0.4                  // on the main actor
+progress.report(fraction: 0.6)           // from any thread, e.g. a URLSession delegate
 Overlayer.service.hideLoading(id)
 
 // Visual only: the screen stays interactive
@@ -118,21 +119,22 @@ Overlayer.loadingConfiguration = LoadingConfiguration(backgroundStyle: AnyShapeS
 
 | Type | Options |
 |---|---|
-| `ToastContainerConfiguration` | `maxVisibleCount`, `spacing`, `edgeInsets`, `animation` |
-| `ToastConfiguration` | `position`, `lifetime`, `haptic`, `isSwipeToDismissEnabled`, `isTapToPauseEnabled`, `isHoldToPauseEnabled`, `showsCloseButton`, `showsProgressBar` |
+| `ToastContainerConfiguration` | `maxVisibleCount`, `spacing`, `edgeInsets`, `maxWidth`, `animation` |
+| `ToastConfiguration` | `position`, `lifetime`, `haptic`, `isSwipeToDismissEnabled`, `isTapToPauseEnabled`, `isHoldToPauseEnabled`, `showsCloseButton`, `showsProgressBar`, `voiceOverMinimumLifetime` |
 | `LoadingConfiguration` | `isBlocking`, `backgroundStyle`, `ignoresSafeArea`, `animation` |
 
 ## Accessibility
 
 - VoiceOver reads a toast when it appears, using the model's `accessibilityAnnouncement`. The ready-made models fill it in for you.
 - Every toast has *Dismiss* and *Pause* / *Resume* actions, and the escape gesture closes it.
+- While VoiceOver is running, a toast stays at least `voiceOverMinimumLifetime` (10 s) so the user can reach it.
 - While a blocking loader is up, VoiceOver stays inside it.
 - With Reduce Motion on, toasts fade instead of sliding.
 - Built-in strings are in English and Russian.
 
 ## Good to know
 
-- Call the API from the main actor. Configurations and ids are `Sendable` and can be created anywhere.
+- Call the service from the main actor. Models, configurations and ids can be created anywhere; the ready-made models are `Sendable`. If your module uses MainActor default isolation, declare your own models `nonisolated` to build them off the main actor.
 - A model is shown only if a view is registered for its exact type. A missing registration stops at an assertion in debug and is logged in release.
 - The status bar, home indicator and rotation follow your app while an overlay is visible.
 - With dependency injection, register `OverlayServiceImpl.shared` and inject `OverlayService`, `ToastPresenting` or `LoadingPresenting`:
@@ -140,6 +142,13 @@ Overlayer.loadingConfiguration = LoadingConfiguration(backgroundStyle: AnyShapeS
 ```swift
 container.register { OverlayServiceImpl.shared as OverlayService }
 ```
+
+## Limitations
+
+- **Multiple windows on iPad.** Overlays appear in the foreground scene they were first shown in and stay there while it is visible, so a toast or loader triggered from another window may show in the wrong one.
+- **Alerts under a blocking loader.** The loader sits above the app's window, so an alert or sheet the app presents while a blocking loader is up appears beneath it and can't be used. Hide the loader first.
+- **Forgotten `hideLoading`.** A blocking loader stays until it is hidden; there is no timeout. Pair every `showLoading` with `hideLoading`, for example in a `defer`.
+- **iOS 16 animations.** Without animation completion on iOS 16, an overlay window hides 0.8 s after its last change, so a custom animation longer than that is cut short.
 
 ## Example
 
