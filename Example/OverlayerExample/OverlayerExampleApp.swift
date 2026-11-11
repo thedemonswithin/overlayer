@@ -24,7 +24,11 @@ struct OverlayerExampleApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if let scene = ShowcaseScene.current {
+                ShowcaseView(scene: scene)
+            } else {
+                ContentView()
+            }
         }
     }
 }

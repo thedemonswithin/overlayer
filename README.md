@@ -64,6 +64,10 @@ Overlayer.service.show(
 - Users can close a toast with its button or a swipe, and pause it with a hold or a tap (swipe and tap are opt-in).
 - `Overlayer.service.dismiss(id)` and `dismissAll()` close toasts from code.
 
+<p align="center">
+  <img src="Assets/screenshots/toasts.png" alt="Ready-made toasts stacked at the bottom, and an error toast at the top in dark mode" width="560">
+</p>
+
 ### Your own toast
 
 A toast is a plain model plus any SwiftUI view. `ToastCard` gives you the standard look with a close button and a progress bar:
@@ -86,6 +90,10 @@ Overlayer.registerToast(DownloadToastModel.self) { model, context in
 
 The `context` lets the view `dismiss()`, `pause()` and `resume()` its toast.
 
+<p align="center">
+  <img src="Assets/screenshots/custom-toast.png" alt="A custom download toast with an Open button" width="285">
+</p>
+
 ## Loading
 
 Loading overlays stack, so nested loads work: the newest one is shown, and the screen stays blocked until the last one is hidden.
@@ -106,6 +114,10 @@ Overlayer.service.showLoading(
 ```
 
 Custom loaders register with `Overlayer.registerLoading(_:content:)`. Their `LoadingContext` can `dismiss()`, for example from a Cancel button.
+
+<p align="center">
+  <img src="Assets/screenshots/loading.png" alt="A determinate upload loader, and a custom loader with a Cancel button in dark mode" width="560">
+</p>
 
 ## Configuration
 
@@ -152,4 +164,4 @@ container.register { OverlayServiceImpl.shared as OverlayService }
 
 ## Example
 
-`Example/` contains a demo app with every feature. Open `Example/OverlayerExample.xcodeproj` and run it.
+`Example/` contains a demo app with every feature. Open `Example/OverlayerExample.xcodeproj` and run it. The screenshots above come from the same app: launch it with `-showcase toasts` (or `error`, `custom`, `progress`, `branded`) to open a scene with the overlays already on screen.

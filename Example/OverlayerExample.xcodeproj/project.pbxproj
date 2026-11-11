@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		52C75544B6F7C72A6D8D9D1C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4ADF280D9D41DA0BFE15B7 /* ContentView.swift */; };
 		73E4A0A269F8C88B0FA4EF49 /* CustomOverlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CDA078649714747520F799 /* CustomOverlays.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* ShowcaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5061728394A5B6C /* ShowcaseView.swift */; };
 		80E67541B97E7046BE484FD9 /* Overlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 431F6D9195E505458766C729 /* Overlayer */; };
 		C1034A716976A0AA27EB0D28 /* OverlayerExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE6D132C1F5214AE7CB1B20 /* OverlayerExampleApp.swift */; };
 		D2E880496C2D7F10C02DBB7D /* OverlayerDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = DD42A5077C806C3ADF418796 /* OverlayerDefaults */; };
@@ -16,6 +17,7 @@
 
 /* Begin PBXFileReference section */
 		51CDA078649714747520F799 /* CustomOverlays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomOverlays.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5061728394A5B6C /* ShowcaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowcaseView.swift; sourceTree = "<group>"; };
 		8C4ADF280D9D41DA0BFE15B7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A34672892EF2C9BF35A3DEF9 /* OverlayerExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = OverlayerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4AA006A34F0B5E8FF93E42B /* Overlayer */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Overlayer; path = ..; sourceTree = SOURCE_ROOT; };
@@ -65,6 +67,7 @@
 			children = (
 				8C4ADF280D9D41DA0BFE15B7 /* ContentView.swift */,
 				51CDA078649714747520F799 /* CustomOverlays.swift */,
+				B1C2D3E4F5061728394A5B6C /* ShowcaseView.swift */,
 				ECE6D132C1F5214AE7CB1B20 /* OverlayerExampleApp.swift */,
 			);
 			path = OverlayerExample;
@@ -133,6 +136,7 @@
 			files = (
 				52C75544B6F7C72A6D8D9D1C /* ContentView.swift in Sources */,
 				73E4A0A269F8C88B0FA4EF49 /* CustomOverlays.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* ShowcaseView.swift in Sources */,
 				C1034A716976A0AA27EB0D28 /* OverlayerExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
