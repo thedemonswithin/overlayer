@@ -85,24 +85,36 @@ import Testing
 
     @Test(.timeLimit(.minutes(1))) func autoDismissesAfterLifetime() async {
         let presenter = makeToastPresenter(maxVisible: 3)
-        let toast = makeToast(on: presenter, lifetime: .seconds(0.05))
+        let sleeper = ManualSleeper()
+        presenter.sleep = sleeper.sleep
+        let toast = makeToast(on: presenter, lifetime: .seconds(4))
+        presenter.present(toast)
+        await sleeper.waitForSleeps(1)
+        #expect(sleeper.requested.map { $0.rounded() } == [4])
+        #expect(presenter.visible.map(\.id) == [toast.id])
         await awaitCallback { done in
             presenter.onChange = { if presenter.visible.isEmpty { done() } }
-            presenter.present(toast)
+            sleeper.releaseAll()
         }
         #expect(presenter.visible.isEmpty)
     }
 
-    @Test(.timeLimit(.minutes(1))) func pausedToastDoesNotExpireUntilResumed() async throws {
+    @Test(.timeLimit(.minutes(1))) func pausedToastDoesNotExpireUntilResumed() async {
         let presenter = makeToastPresenter(maxVisible: 3)
-        let toast = makeToast(on: presenter, lifetime: .seconds(0.05))
+        let sleeper = ManualSleeper()
+        presenter.sleep = sleeper.sleep
+        let toast = makeToast(on: presenter, lifetime: .seconds(4))
         presenter.present(toast)
+        await sleeper.waitForSleeps(1)
         presenter.pause(id: toast.id)
-        try await Task.sleep(nanoseconds: 200_000_000)
-        #expect(presenter.visible.map(\.id) == [toast.id], "a paused toast outlives its lifetime")
+        sleeper.releaseAll()
+        for _ in 0..<20 { await Task.yield() }
+        #expect(presenter.visible.map(\.id) == [toast.id], "the cancelled countdown must not dismiss a paused toast")
+        presenter.resume(id: toast.id)
+        await sleeper.waitForSleeps(1)
         await awaitCallback { done in
             presenter.onChange = { if presenter.visible.isEmpty { done() } }
-            presenter.resume(id: toast.id)
+            sleeper.releaseAll()
         }
         #expect(presenter.visible.isEmpty)
     }

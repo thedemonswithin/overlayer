@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The package needs Swift 6.4 (Xcode 27 or newer).
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Pick a simulator
+        id: simulator
+        run: |
+          udid=$(xcrun simctl list devices available --json \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for r,v in sorted(d.items(), reverse=True) if "iOS" in r for x in v if x["name"].startswith("iPhone")))')
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+      - name: Test package
+        run: |
+          xcodebuild test \
+            -scheme Overlayer-Package \
+            -destination "id=${{ steps.simulator.outputs.udid }}"
+
+      - name: Build example app
+        working-directory: Example
+        run: |
+          xcodebuild build \
+            -project OverlayerExample.xcodeproj \
+            -scheme OverlayerExample \
+            -destination "id=${{ steps.simulator.outputs.udid }}"

@@ -30,6 +30,10 @@ final class ToastPresenter: ObservableObject {
     var announce: @MainActor (String?) -> Void = OverlayAccessibility.announce
     /// Whether VoiceOver is running; replaceable in tests.
     var isVoiceOverRunning: @MainActor () -> Bool = { UIAccessibility.isVoiceOverRunning }
+    /// Waits out a toast's remaining lifetime; replaceable in tests so they don't depend on real time. Returns early when the task is cancelled.
+    var sleep: @Sendable (TimeInterval) async -> Void = { seconds in
+        try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+    }
 
     private var queue: [ActiveToast] = []
     /// One sleeping task per running auto-dismiss toast; nothing ticks.
@@ -125,8 +129,9 @@ final class ToastPresenter: ObservableObject {
         cancelExpiry(of: toast.id)
         guard let remaining = context.timer.remaining(at: context.clock()) else { return }
         let id = toast.id
+        let sleep = self.sleep
         expiryTasks[id] = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(remaining * 1_000_000_000))
+            await sleep(remaining)
             guard !Task.isCancelled else { return }
             self?.expiryTasks[id] = nil
             self?.dismiss(id: id)

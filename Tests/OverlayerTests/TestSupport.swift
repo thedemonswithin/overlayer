@@ -55,3 +55,29 @@ final class ManualAnimations {
 
     func settle(_ index: Int) { pending[index]() }
 }
+
+/// Stand-in for the presenter's sleep: every call suspends until the test releases it, and records how long it was asked to wait.
+final class ManualSleeper {
+    private var pending: [(seconds: TimeInterval, continuation: CheckedContinuation<Void, Never>)] = []
+
+    var requested: [TimeInterval] { pending.map(\.seconds) }
+
+    var sleep: @Sendable (TimeInterval) async -> Void {
+        { [self] seconds in
+            await withCheckedContinuation { continuation in
+                Task { @MainActor in self.pending.append((seconds, continuation)) }
+            }
+        }
+    }
+
+    /// Suspends until at least `count` sleeps are waiting.
+    func waitForSleeps(_ count: Int) async {
+        while pending.count < count { await Task.yield() }
+    }
+
+    func releaseAll() {
+        let released = pending
+        pending.removeAll()
+        released.forEach { $0.continuation.resume() }
+    }
+}
