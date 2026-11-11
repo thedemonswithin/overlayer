@@ -115,9 +115,7 @@ final class OverlayWindowManager {
         let host = OverlayHostingController(rootView: ToastHostView(presenter: toastPresenter, relay: relay))
         host.view.backgroundColor = .clear
         window.rootViewController = host
-        window.isHidden = true
-        // Render the empty state once, so the first toast is an animated insertion rather than the host's initial content.
-        host.view.layoutIfNeeded()
+        Self.renderEmptyState(of: window)
         return window
     }
 
@@ -129,9 +127,14 @@ final class OverlayWindowManager {
         let host = OverlayHostingController(rootView: LoadingHostView(presenter: loadingPresenter))
         host.view.backgroundColor = .clear
         window.rootViewController = host
-        window.isHidden = true
-        // Render the empty state once, so the first loader fades in instead of appearing as the host's initial content.
-        host.view.layoutIfNeeded()
+        Self.renderEmptyState(of: window)
         return window
+    }
+
+    // A hidden window doesn't install its root view, so the first overlay would become the host's initial content and appear without its transition. Showing the still-empty window for one layout pass builds the SwiftUI hierarchy; the window is empty and non-blocking at this point, so nothing is drawn or intercepted.
+    private static func renderEmptyState(of window: UIWindow) {
+        window.isHidden = false
+        window.layoutIfNeeded()
+        window.isHidden = true
     }
 }

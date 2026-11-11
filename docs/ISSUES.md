@@ -5,13 +5,13 @@ Code review of 2.0.0 (`b208574`). Each task lists the problem and the fix; the r
 | # | Task | Labels | Status |
 |---|---|---|---|
 | 1 | [Crash on infinite or huge toast lifetime](#1-crash-on-infinite-or-huge-toast-lifetime) | bug, priority: high | Fixed |
-| 2 | [Last loader disappears without animation](#2-last-loader-disappears-without-animation) | bug, priority: high | Fixed; check the fade-out on a device |
-| 3 | [Toast can stay paused forever after a cancelled drag](#3-toast-can-stay-paused-forever-after-a-cancelled-drag) | bug, priority: high | Fixed; check gestures on a device |
+| 2 | [Last loader disappears without animation](#2-last-loader-disappears-without-animation) | bug, priority: high | Fixed; fade-out checked on a simulator |
+| 3 | [Toast can stay paused forever after a cancelled drag](#3-toast-can-stay-paused-forever-after-a-cancelled-drag) | bug, priority: high | Fixed; spring-back, swipe-to-dismiss and resume after a drag checked on a simulator |
 | 4 | [maxVisibleCount ≤ 0 silently hides all toasts](#4-maxvisiblecount--0-silently-hides-all-toasts) | bug | Fixed |
 | 5 | [Bundled models and LoadingProgress can't be used off the main actor](#5-bundled-models-and-loadingprogress-cant-be-used-off-the-main-actor) | bug, api | Fixed |
 | 6 | [iPad multi-window: overlay appears in an arbitrary scene](#6-ipad-multi-window-overlay-appears-in-an-arbitrary-scene) | bug, enhancement | Documented in README; per-scene overlays are on the roadmap |
-| 7 | [Toasts stretch to the full screen width](#7-toasts-stretch-to-the-full-screen-width) | enhancement | Fixed |
-| 8 | [Overlay window can hide too early; first show has no appear animation](#8-overlay-window-can-hide-too-early-first-show-has-no-appear-animation) | bug | Fixed; iOS 16 delay documented |
+| 7 | [Toasts stretch to the full screen width](#7-toasts-stretch-to-the-full-screen-width) | enhancement | Fixed; checked in landscape on a simulator |
+| 8 | [Overlay window can hide too early; first show has no appear animation](#8-overlay-window-can-hide-too-early-first-show-has-no-appear-animation) | bug | Fixed; first loader and toast animate in (checked on a simulator); iOS 16 delay documented |
 | 9 | [VoiceOver: toast disappears before it can be reached](#9-voiceover-toast-disappears-before-it-can-be-reached) | accessibility | Lifetime fixed; check the actions with VoiceOver on a device |
 | 10 | [Tests and CI](#10-tests-and-ci) | infrastructure | Timing tests and CI done; window and gesture tests open |
 | 11 | [Document blocking loader limitations](#11-document-blocking-loader-limitations) | documentation | Documented in README |
@@ -34,7 +34,7 @@ Negative values and NaN don't crash, but the toast disappears instantly with no 
 
 ## 2. Last loader disappears without animation
 
-*bug, priority: high* · **Status:** Fixed; check the fade-out on a device
+*bug, priority: high* · **Status:** Fixed; fade-out checked on a simulator
 
 ### Problem
 
@@ -51,7 +51,7 @@ Found by reading the code; not yet confirmed on a device.
 
 ## 3. Toast can stay paused forever after a cancelled drag
 
-*bug, priority: high* · **Status:** Fixed; check gestures on a device
+*bug, priority: high* · **Status:** Fixed; spring-back, swipe-to-dismiss and resume after a drag checked on a simulator
 
 ### Problem
 
@@ -118,7 +118,7 @@ The window is placed in the first `foregroundActive` scene ([`OverlayScene`](htt
 
 ## 7. Toasts stretch to the full screen width
 
-*enhancement* · **Status:** Fixed
+*enhancement* · **Status:** Fixed; checked in landscape on a simulator
 
 ### Problem
 
@@ -130,7 +130,7 @@ Add `maxWidth` to `ToastContainerConfiguration` with a sensible default (around 
 
 ## 8. Overlay window can hide too early; first show has no appear animation
 
-*bug* · **Status:** Fixed; iOS 16 delay documented
+*bug* · **Status:** Fixed; first loader and toast animate in (checked on a simulator); iOS 16 delay documented
 
 ### Problem
 
