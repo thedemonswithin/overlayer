@@ -26,6 +26,15 @@ import Testing
         let container = ToastContainerConfiguration.default
         #expect(container.maxVisibleCount == 3)
         #expect(container.spacing == 8)
+        #expect(container.maxWidth == 500)
+    }
+
+    @Test(arguments: [0, -3])
+    nonisolated func maxVisibleCountIsAtLeastOne(value: Int) {
+        #expect(ToastContainerConfiguration(maxVisibleCount: value).maxVisibleCount == 1)
+        var configuration = ToastContainerConfiguration()
+        configuration.maxVisibleCount = value
+        #expect(configuration.maxVisibleCount == 1)
     }
 
     @Test(arguments: [

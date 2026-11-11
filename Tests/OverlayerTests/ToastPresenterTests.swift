@@ -155,4 +155,12 @@ import Testing
         }
         #expect(presenter.visible.isEmpty)
     }
+
+    // Regression: a zero limit used to queue every toast forever.
+    @Test func zeroLimitStillShowsOneToast() {
+        let presenter = makeToastPresenter(maxVisible: 0)
+        let toast = makeToast(on: presenter)
+        presenter.present(toast)
+        #expect(presenter.visible.map(\.id) == [toast.id])
+    }
 }

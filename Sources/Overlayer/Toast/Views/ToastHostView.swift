@@ -28,7 +28,7 @@ struct ToastHostView: View {
         VStack(spacing: configuration.spacing) {
             ForEach(toasts(at: position)) { toast in
                 ToastItemView(toast: toast)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: configuration.maxWidth ?? .infinity)
                     .background {
                         GeometryReader { proxy in
                             Color.clear.preference(
