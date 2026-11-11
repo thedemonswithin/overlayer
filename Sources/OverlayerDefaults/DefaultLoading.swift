@@ -9,7 +9,7 @@ public import Combine
 public import Overlayer
 public import SwiftUI
 
-public struct SpinnerLoadingModel: LoadingModel {
+nonisolated public struct SpinnerLoadingModel: LoadingModel, Sendable {
     public var message: String?
 
     public var accessibilityAnnouncement: String? {
@@ -41,7 +41,7 @@ public struct SpinnerLoadingView: View {
     }
 }
 
-/// Observable progress source for determinate loading (file up/download, long tasks). Retain it, pass it inside `ProgressLoadingModel`, and update `fraction` / `message` while the overlay is shown.
+/// Observable progress source for determinate loading (file up/download, long tasks). Retain it, pass it inside `ProgressLoadingModel`, and update it while the overlay is shown: set `fraction` / `message` on the main actor, or call `report(fraction:message:)` from anywhere.
 public final class LoadingProgress: ObservableObject {
     @Published public var fraction: Double
     @Published public var message: String?
@@ -49,6 +49,14 @@ public final class LoadingProgress: ObservableObject {
     public init(fraction: Double = 0, message: String? = nil) {
         self.fraction = fraction
         self.message = message
+    }
+
+    /// Updates the progress from any thread or actor (e.g. a URLSession delegate); the change is applied on the main actor. A `nil` message keeps the current one.
+    public nonisolated func report(fraction: Double, message: String? = nil) {
+        Task { @MainActor in
+            self.fraction = fraction
+            if let message { self.message = message }
+        }
     }
 }
 

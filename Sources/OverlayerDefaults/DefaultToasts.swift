@@ -8,7 +8,7 @@
 public import Overlayer
 public import SwiftUI
 
-public struct SuccessToastModel: ToastModel {
+nonisolated public struct SuccessToastModel: ToastModel, Sendable {
     public var title: String?
     public var message: String
 
@@ -22,7 +22,7 @@ public struct SuccessToastModel: ToastModel {
     }
 }
 
-public struct ErrorToastModel: ToastModel {
+nonisolated public struct ErrorToastModel: ToastModel, Sendable {
     public var title: String?
     public var message: String
 
@@ -36,7 +36,7 @@ public struct ErrorToastModel: ToastModel {
     }
 }
 
-public struct InfoToastModel: ToastModel {
+nonisolated public struct InfoToastModel: ToastModel, Sendable {
     public var title: String?
     public var message: String
 
@@ -50,7 +50,7 @@ public struct InfoToastModel: ToastModel {
     }
 }
 
-public struct WarningToastModel: ToastModel {
+nonisolated public struct WarningToastModel: ToastModel, Sendable {
     public var title: String?
     public var message: String
 

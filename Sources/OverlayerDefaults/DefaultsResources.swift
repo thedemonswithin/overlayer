@@ -8,6 +8,6 @@
 import Foundation
 
 // Bundle holding this module's localized strings, named so it does not clash with Overlayer's own `Bundle.module`.
-enum DefaultsResources {
+nonisolated enum DefaultsResources {
     static var bundle: Bundle { .module }
 }
